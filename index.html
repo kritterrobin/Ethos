@@ -6,1302 +6,597 @@
 <title>ETHOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
-:root {
-  --ink: #0d0a06;
-  --parchment: #f5eddc;
-  --gold: #c8a951;
-  --gold-pale: rgba(200,169,81,0.18);
-  --gold-dim: rgba(200,169,81,0.35);
-  --ember: #c0392b;
-  --ember-pale: rgba(192,57,43,0.15);
-  --sage: #2e6b4f;
-  --sage-pale: rgba(46,107,79,0.15);
-  --slate: rgba(245,237,220,0.06);
-  --panel: rgba(13,10,6,0.82);
-  --border: rgba(200,169,81,0.22);
+:root{
+  --ink:#0d0a06;--parchment:#f5eddc;--gold:#c8a951;
+  --gold-pale:rgba(200,169,81,0.14);--gold-dim:rgba(200,169,81,0.28);
+  --ember:#c0392b;--sage:#2e6b4f;--border:rgba(200,169,81,0.18);
+  --blue:#3a7fd5;--red:#c0392b;--green:#2e8b57;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100vh;overflow-x:hidden;background:var(--ink);}
+html,body{min-height:100vh;background:var(--ink);overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(200,169,81,0.06) 0%,transparent 60%);}
+.app{position:relative;z-index:1;max-width:460px;margin:0 auto;min-height:100vh;
+  display:flex;flex-direction:column;padding-bottom:50px;}
 
-/* ── NOISE TEXTURE OVERLAY ── */
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:0;opacity:0.6;
-}
+/* HEADER */
+.hdr{text-align:center;padding:20px 16px 12px;border-bottom:1px solid var(--border);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,10vw,3.4rem);
+  color:var(--gold);letter-spacing:0.4em;line-height:1;
+  text-shadow:0 0 40px rgba(200,169,81,0.15);}
+.byline{font-family:'DM Mono',monospace;font-size:0.68rem;
+  color:rgba(200,169,81,0.35);letter-spacing:0.2em;margin-top:3px;}
 
-/* ── AMBIENT GLOW ── */
-body::after{
-  content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,169,81,0.06) 0%, transparent 65%),
-             radial-gradient(ellipse 50% 40% at 20% 100%, rgba(46,107,79,0.05) 0%, transparent 55%);
-  pointer-events:none;z-index:0;
-}
+/* SCREENS */
+.screen{display:none;padding:14px 16px;}
+.screen.active{display:block;animation:fadeUp 0.25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-.app{position:relative;z-index:1;max-width:480px;margin:0 auto;min-height:100vh;
-  display:flex;flex-direction:column;padding:0 0 60px;}
+/* SETUP */
+.setup-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-style:italic;
+  color:var(--parchment);text-align:center;margin:6px 0 4px;}
+.setup-sub{font-family:'DM Mono',monospace;font-size:0.72rem;
+  color:rgba(245,237,220,0.28);text-align:center;letter-spacing:0.12em;margin-bottom:18px;}
+.lbl{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--gold);
+  letter-spacing:0.16em;display:block;margin-bottom:6px;}
+.pick-row{display:flex;gap:7px;margin-bottom:18px;}
+.popt{flex:1;background:rgba(200,169,81,0.03);border:1px solid var(--border);
+  border-radius:5px;padding:10px 6px;text-align:center;cursor:pointer;transition:all 0.14s;}
+.popt.on{border-color:var(--gold);background:var(--gold-pale);}
+.popt-val{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--gold);
+  letter-spacing:0.08em;display:block;line-height:1;}
+.popt-lbl{font-family:'DM Mono',monospace;font-size:0.68rem;
+  color:rgba(245,237,220,0.3);letter-spacing:0.06em;display:block;margin-top:2px;}
+.finput{width:100%;background:rgba(200,169,81,0.04);border:1px solid var(--border);
+  color:var(--parchment);padding:10px 12px;font-family:'Cormorant Garamond',serif;
+  font-size:1rem;border-radius:4px;outline:none;margin-bottom:10px;
+  transition:border-color 0.2s;-webkit-appearance:none;}
+.finput:focus{border-color:var(--gold);}
+.name-fields{margin-bottom:18px;}
 
-/* ── HEADER ── */
-.app-header{
-  text-align:center;padding:28px 20px 18px;
-  border-bottom:1px solid var(--border);
-  background:linear-gradient(180deg, rgba(200,169,81,0.04) 0%, transparent 100%);
-  position:relative;
-}
-.app-header::after{
-  content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;
-  background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);
-}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,12vw,4.2rem);
-  color:var(--gold);letter-spacing:0.35em;
-  text-shadow:0 0 60px rgba(200,169,81,0.2), 0 2px 0 rgba(0,0,0,0.5);
-  line-height:1;}
-.logo-sub{font-family:'DM Mono',monospace;font-size:0.55rem;color:rgba(200,169,81,0.4);
-  letter-spacing:0.35em;margin-top:4px;text-transform:uppercase;}
-
-/* ── SCREENS ── */
-.screen{display:none;padding:20px 16px;animation:fadeUp 0.3s ease;}
-.screen.active{display:block;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── SETUP ── */
-.setup-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:var(--parchment);
-  text-align:center;margin-bottom:6px;font-style:italic;}
-.setup-sub{font-family:'DM Mono',monospace;font-size:0.65rem;color:rgba(245,237,220,0.35);
-  text-align:center;letter-spacing:0.12em;margin-bottom:24px;}
-
-.field-label{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--gold);
-  letter-spacing:0.18em;margin-bottom:6px;display:block;}
-.field-input{width:100%;background:rgba(200,169,81,0.05);border:1px solid var(--border);
-  color:var(--parchment);padding:12px 14px;font-family:'Cormorant Garamond',serif;
-  font-size:1.05rem;border-radius:4px;outline:none;transition:border-color 0.2s;margin-bottom:20px;}
-.field-input:focus{border-color:var(--gold);}
-
-/* Level cards */
-.level-label{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--gold);
-  letter-spacing:0.18em;margin-bottom:10px;display:block;}
-.level-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px;}
-.lv{background:rgba(200,169,81,0.04);border:1px solid var(--border);border-radius:6px;
-  padding:12px 10px;cursor:pointer;transition:all 0.18s;text-align:center;
-  position:relative;overflow:hidden;}
-.lv::before{content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(200,169,81,0.06),transparent);opacity:0;transition:opacity 0.2s;}
-.lv:hover::before,.lv.on::before{opacity:1;}
-.lv.on{border-color:var(--gold);box-shadow:0 0 16px rgba(200,169,81,0.12),inset 0 0 12px rgba(200,169,81,0.05);}
-.lv-em{font-size:1.6rem;display:block;margin-bottom:4px;}
-.lv-name{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--parchment);
-  display:block;margin-bottom:2px;}
-.lv-age{font-family:'DM Mono',monospace;font-size:0.55rem;color:rgba(245,237,220,0.38);
-  letter-spacing:0.08em;display:block;}
-.lv-tag{font-family:'DM Mono',monospace;font-size:0.52rem;color:rgba(245,237,220,0.3);
-  margin-top:4px;display:block;line-height:1.4;}
-
-/* ── BUTTONS ── */
+/* BUTTONS */
 .btn{display:block;width:100%;background:var(--gold);color:var(--ink);border:none;
-  padding:14px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:0.2em;
-  cursor:pointer;border-radius:4px;transition:all 0.15s;-webkit-appearance:none;}
-.btn:active{transform:scale(0.98);opacity:0.9;}
-.btn:hover{background:#d9bb62;}
+  padding:13px;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:0.2em;
+  cursor:pointer;border-radius:4px;transition:all 0.12s;-webkit-appearance:none;}
+.btn:active{transform:scale(0.98);}
+.btn:hover{background:#d4b55e;}
 .btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold-dim);}
 .btn.ghost:hover{background:var(--gold-pale);}
-.btn.sm{padding:10px 18px;width:auto;font-size:0.9rem;display:inline-block;}
+.btn.big{font-size:1.3rem;padding:18px;letter-spacing:0.25em;}
+.btn.sm{width:auto;padding:9px 18px;font-size:0.88rem;display:inline-block;}
 .btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px;}
 
-/* ── BUILDING ── */
-.build-wrap{text-align:center;padding:20px 0;}
-.build-title{font-family:'Cormorant Garamond',serif;font-size:1.5rem;color:var(--parchment);
-  font-style:italic;margin-bottom:8px;}
-.build-status{font-family:'DM Mono',monospace;font-size:0.68rem;color:rgba(245,237,220,0.45);
-  letter-spacing:0.1em;min-height:1.4em;animation:pulse 1.5s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-.progress-track{height:2px;background:rgba(200,169,81,0.1);border-radius:2px;
-  margin:16px 0;overflow:hidden;}
-.progress-fill{height:100%;background:var(--gold);border-radius:2px;
-  transition:width 0.5s ease;width:0%;}
-.build-log{max-height:220px;overflow-y:auto;margin-top:12px;text-align:left;}
-.build-item{font-family:'DM Mono',monospace;font-size:0.65rem;padding:4px 0;
-  border-bottom:1px solid rgba(200,169,81,0.06);display:flex;gap:8px;
-  color:rgba(245,237,220,0.4);}
-.build-item.done{color:rgba(245,237,220,0.7);}
-.build-item .ck{color:var(--gold);flex-shrink:0;}
+/* HUD */
+.hud{padding:10px 14px 8px;border-bottom:1px solid var(--border);}
+.hud-players{display:flex;gap:6px;margin-bottom:8px;}
+.hud-p{flex:1;border:1px solid var(--border);border-radius:5px;padding:8px 8px 6px;
+  text-align:center;transition:all 0.2s;background:rgba(200,169,81,0.02);}
+.hud-p.active{border-color:var(--gold);background:var(--gold-pale);}
+.hud-p.done{opacity:0.4;}
+.hud-pname{font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.1em;
+  color:rgba(245,237,220,0.4);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hud-pscore{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:0.08em;color:var(--parchment);}
+.hud-pscore.pos{color:#4caf7d;}
+.hud-pscore.neg{color:var(--ember);}
+.hud-ptime{font-family:'DM Mono',monospace;font-size:0.82rem;color:rgba(200,169,81,0.55);
+  margin-top:2px;letter-spacing:0.04em;}
+.hud-ptime.urgent{color:#e07060;animation:pulse 0.8s ease-in-out infinite;}
+.hud-ptime.done-t{color:rgba(245,237,220,0.2);}
+/* timer bar */
+.timer-bar-wrap{height:5px;background:rgba(200,169,81,0.08);border-radius:2px;overflow:hidden;margin-top:4px;}
+.timer-bar{height:100%;background:var(--gold);border-radius:2px;transition:width 1s linear;}
+.timer-bar.urgent{background:var(--ember);}
 
-/* ── GAME HUD ── */
-.hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
-  padding:12px 16px;border-bottom:1px solid var(--border);gap:8px;
-  background:linear-gradient(180deg,rgba(200,169,81,0.03),transparent);}
-.hud-player{text-align:left;}
-.hud-player.right{text-align:right;}
-.hud-name{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.12em;
-  color:rgba(245,237,220,0.38);margin-bottom:2px;}
-.hud-score{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;color:var(--parchment);}
-.hud-score.pos{color:#4caf7d;}
-.hud-score.neg{color:var(--ember);}
-.hud-center{text-align:center;}
-.hud-round{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);letter-spacing:0.15em;}
-.hud-turns{font-family:'DM Mono',monospace;font-size:0.5rem;color:rgba(200,169,81,0.45);letter-spacing:0.1em;}
-.hud-level{font-size:1rem;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 
-/* ── TURN INDICATOR ── */
-.turn-strip{
-  margin:0 16px 0;padding:8px 14px;border-radius:4px;
-  font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;
-  display:flex;align-items:center;gap:8px;
-}
-.turn-strip.human{background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.25);color:#5dade2;}
-.turn-strip.ai{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.25);color:#e74c3c;}
-.turn-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;animation:blink 1.2s ease-in-out infinite;}
-.turn-strip.human .turn-dot{background:#5dade2;}
-.turn-strip.ai .turn-dot{background:#e74c3c;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+/* PASS SCREEN */
+.pass-wrap{text-align:center;padding:20px 0;}
+.pass-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,10vw,3rem);
+  color:var(--gold);letter-spacing:0.25em;margin-bottom:6px;
+  text-shadow:0 0 30px rgba(200,169,81,0.2);}
+.pass-sub{font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:1.2rem;color:rgba(245,237,220,0.45);margin-bottom:6px;}
+.pass-time{font-family:'DM Mono',monospace;font-size:1rem;
+  color:rgba(200,169,81,0.5);letter-spacing:0.12em;margin-bottom:24px;}
 
-/* ── CARDS ── */
-.card{background:linear-gradient(160deg,rgba(22,17,8,0.95),rgba(10,8,3,0.98));
-  border:1px solid var(--border);border-radius:8px;padding:20px 18px;margin:14px 16px 0;
-  position:relative;overflow:hidden;}
+/* CARD */
+.card{background:linear-gradient(155deg,rgba(20,15,6,0.96),rgba(8,6,2,0.98));
+  border:1px solid var(--border);border-radius:7px;padding:16px 15px;
+  margin:10px 0 0;position:relative;overflow:hidden;}
 .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(200,169,81,0.4),transparent);}
+  background:linear-gradient(90deg,transparent,rgba(200,169,81,0.3),transparent);}
+.card-label{font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.18em;
+  color:rgba(200,169,81,0.4);margin-bottom:7px;display:block;}
+.situation{font-family:'Cormorant Garamond',serif;font-size:1.15rem;
+  line-height:1.65;color:rgba(245,237,220,0.88);}
+.ent-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;
+  padding-bottom:10px;border-bottom:1px solid rgba(200,169,81,0.1);}
+.ent-icon{font-size:1.8rem;flex-shrink:0;}
+.ent-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;
+  color:var(--gold);line-height:1.2;}
+.ent-flavor{font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:0.95rem;color:rgba(245,237,220,0.38);line-height:1.4;}
 
-/* ── DICE CARD ── */
-.dice-card{}
-.dice-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--parchment);
-  font-style:italic;margin-bottom:14px;text-align:center;}
-.dice-row{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0;}
-.die{width:56px;height:56px;background:var(--parchment);color:var(--ink);border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:2rem;font-weight:900;font-family:'Cormorant Garamond',serif;
-  box-shadow:3px 4px 0 rgba(0,0,0,0.7),0 0 0 1px rgba(200,169,81,0.3);
-  transition:transform 0.1s;}
-.die.rolling{animation:tumble 0.45s ease;}
-@keyframes tumble{
-  0%{transform:rotate(0) scale(1)}
-  20%{transform:rotate(-22deg) scale(1.18)}
-  45%{transform:rotate(19deg) scale(1.18)}
-  65%{transform:rotate(-11deg) scale(1.05)}
-  82%{transform:rotate(7deg)}
-  100%{transform:rotate(0) scale(1)}
-}
-.dice-result{font-family:'DM Mono',monospace;font-size:0.68rem;
-  color:rgba(245,237,220,0.45);text-align:center;min-height:1.2em;letter-spacing:0.08em;}
+/* OPTIONS */
+.options{display:flex;flex-direction:column;gap:7px;margin-top:2px;}
+.opt{background:rgba(200,169,81,0.03);border:1px solid var(--border);
+  border-radius:5px;padding:12px 14px;cursor:pointer;
+  font-family:'Cormorant Garamond',serif;font-size:1.08rem;
+  color:rgba(245,237,220,0.8);line-height:1.5;
+  transition:all 0.13s;text-align:left;width:100%;-webkit-appearance:none;}
+.opt:hover{border-color:rgba(200,169,81,0.4);background:rgba(200,169,81,0.06);}
+.opt:active{transform:scale(0.99);}
+.opt.selected{border-color:var(--gold);background:var(--gold-pale);}
+.opt.revealed.best{border-color:#4caf7d;background:rgba(76,175,125,0.07);}
+.opt.revealed.good{border-color:#7fb87f;background:rgba(127,184,127,0.05);}
+.opt.revealed.poor{border-color:#c8874a;background:rgba(200,135,74,0.05);}
+.opt.revealed.worst{border-color:var(--ember);background:rgba(192,57,43,0.06);}
+.opt-inner{display:flex;flex-direction:column;gap:3px;}
+.opt-reveal{font-family:'DM Mono',monospace;font-size:0.72rem;
+  display:none;margin-top:5px;align-items:flex-start;gap:6px;flex-wrap:wrap;}
+.opt.revealed .opt-reveal{display:flex;}
+.opt-badge{font-weight:700;padding:2px 9px;border-radius:10px;
+  font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.04em;flex-shrink:0;}
+.best .opt-badge{background:rgba(76,175,125,0.18);color:#4caf7d;}
+.good .opt-badge{background:rgba(127,184,127,0.18);color:#7fb87f;}
+.poor .opt-badge{background:rgba(200,135,74,0.18);color:#c8874a;}
+.worst .opt-badge{background:rgba(192,57,43,0.14);color:#e07060;}
+.opt-why{color:rgba(245,237,220,0.4);font-size:0.76rem;line-height:1.4;flex:1;}
+.opt-pts{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.06em;margin-left:auto;}
+.best .opt-pts{color:#4caf7d;}
+.good .opt-pts{color:#7fb87f;}
+.poor .opt-pts{color:#c8874a;}
+.worst .opt-pts{color:#e07060;}
 
-/* ── ENTITY REVEAL CARD ── */
-.entity-card{text-align:center;animation:cardReveal 0.45s cubic-bezier(0.34,1.56,0.64,1);}
-@keyframes cardReveal{from{opacity:0;transform:scale(0.88) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.entity-icon{font-size:3.8rem;display:block;margin-bottom:10px;
-  animation:iconBounce 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;}
-@keyframes iconBounce{from{transform:scale(0.4);opacity:0}to{transform:scale(1);opacity:1}}
-.entity-name{font-family:'Cormorant Garamond',serif;font-size:clamp(1.3rem,5vw,1.9rem);
-  font-weight:700;color:var(--gold);margin-bottom:4px;line-height:1.2;}
-.entity-flavor{font-family:'Cormorant Garamond',serif;font-style:italic;
-  font-size:0.9rem;color:rgba(245,237,220,0.45);margin-bottom:14px;line-height:1.5;}
-.type-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;
-  border-radius:20px;font-family:'DM Mono',monospace;font-size:0.62rem;
-  letter-spacing:0.1em;font-weight:500;}
-.type-badge.benefit{background:rgba(46,107,79,0.2);border:1px solid rgba(46,107,79,0.4);color:#5cb88a;}
-.type-badge.problem{background:rgba(192,57,43,0.15);border:1px solid rgba(192,57,43,0.35);color:#e07060;}
-
-/* ── SCENARIO / RESPONSE CARDS ── */
-.scene-label{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.2em;
-  color:rgba(200,169,81,0.5);margin-bottom:8px;display:block;}
-.scene-text{font-family:'Cormorant Garamond',serif;font-size:1.05rem;line-height:1.7;
-  color:rgba(245,237,220,0.88);}
-.response-bubble{border-left:3px solid var(--gold);padding:12px 14px;margin:10px 0;
-  background:rgba(200,169,81,0.04);border-radius:0 6px 6px 0;}
-.response-bubble.blue{border-color:#5dade2;background:rgba(93,173,226,0.05);}
-.response-bubble.red{border-color:#e74c3c;background:rgba(231,76,60,0.05);}
-.bubble-label{font-family:'DM Mono',monospace;font-size:0.55rem;letter-spacing:0.15em;
-  color:rgba(245,237,220,0.3);margin-bottom:5px;display:block;}
-.bubble-text{font-family:'Cormorant Garamond',serif;font-size:0.95rem;line-height:1.65;
-  color:rgba(245,237,220,0.82);}
-
-textarea{width:100%;background:rgba(200,169,81,0.04);border:1px solid var(--border);
-  color:var(--parchment);padding:12px 14px;font-family:'Cormorant Garamond',serif;
-  font-size:1rem;border-radius:4px;resize:none;min-height:90px;line-height:1.6;
-  outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
-textarea:focus{border-color:var(--gold);}
-
-/* ── SCORE POP ── */
-.score-pop{text-align:center;padding:16px;border-radius:6px;margin:12px 0;
-  animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1);}
-@keyframes popIn{from{transform:scale(0.7);opacity:0}to{transform:scale(1);opacity:1}}
-.score-pop.pos{background:rgba(76,175,125,0.1);border:1px solid rgba(76,175,125,0.3);}
-.score-pop.neg{background:rgba(192,57,43,0.1);border:1px solid rgba(192,57,43,0.3);}
+/* SCORE POP */
+.score-pop{text-align:center;padding:12px;border-radius:5px;margin:10px 0;
+  animation:popIn 0.28s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes popIn{from{opacity:0;transform:scale(0.82)}to{opacity:1;transform:scale(1)}}
+.score-pop.pos{background:rgba(76,175,125,0.07);border:1px solid rgba(76,175,125,0.22);}
+.score-pop.neg{background:rgba(192,57,43,0.07);border:1px solid rgba(192,57,43,0.22);}
 .score-pop.neu{background:var(--gold-pale);border:1px solid var(--gold-dim);}
-.score-big{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:0.1em;display:block;}
+.score-big{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:0.1em;display:block;}
 .score-pop.pos .score-big{color:#4caf7d;}
 .score-pop.neg .score-big{color:var(--ember);}
 .score-pop.neu .score-big{color:var(--gold);}
-.score-sub{font-family:'DM Mono',monospace;font-size:0.6rem;color:rgba(245,237,220,0.4);
-  letter-spacing:0.1em;margin-top:2px;}
+.score-sub{font-family:'DM Mono',monospace;font-size:0.74rem;
+  color:rgba(245,237,220,0.32);letter-spacing:0.08em;}
 
-/* ── CHANCE CARD ── */
-.chance-card{text-align:center;}
-.chance-icon{font-size:3rem;display:block;margin-bottom:10px;}
-.chance-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--gold);
-  letter-spacing:0.2em;margin-bottom:8px;}
-.chance-body{font-family:'Cormorant Garamond',serif;font-size:1rem;line-height:1.65;
-  color:rgba(245,237,220,0.75);margin-bottom:4px;}
-.chance-effect{font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;
-  margin-top:10px;padding:8px 12px;border-radius:4px;display:inline-block;}
-.chance-effect.bad{background:var(--ember-pale);border:1px solid rgba(192,57,43,0.3);color:#e07060;}
-.chance-effect.good{background:var(--sage-pale);border:1px solid rgba(46,107,79,0.3);color:#5cb88a;}
-.chance-effect.neutral{background:var(--gold-pale);border:1px solid var(--gold-dim);color:var(--gold);}
+/* TIME UP BANNER */
+.timeup-banner{background:rgba(192,57,43,0.12);border:1px solid rgba(192,57,43,0.3);
+  border-radius:5px;padding:12px;text-align:center;margin:10px 0;}
+.timeup-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--ember);
+  letter-spacing:0.2em;display:block;}
+.timeup-sub{font-family:'DM Mono',monospace;font-size:0.8rem;
+  color:rgba(245,237,220,0.35);letter-spacing:0.08em;margin-top:3px;}
 
-/* ── LOADING ── */
-.loading-text{text-align:center;font-family:'DM Mono',monospace;font-size:0.72rem;
-  color:rgba(200,169,81,0.6);padding:20px;letter-spacing:0.1em;animation:pulse 1.5s ease-in-out infinite;}
-
-/* ── WIN SCREEN ── */
-.win-wrap{text-align:center;padding:10px 0;}
-.win-eyebrow{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.2em;
-  color:rgba(200,169,81,0.45);margin-bottom:8px;}
-.win-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,10vw,3.5rem);
-  color:var(--gold);letter-spacing:0.25em;
-  text-shadow:0 0 40px rgba(200,169,81,0.3);margin-bottom:6px;}
-.final-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0;}
-.fp{border:1px solid var(--border);border-radius:6px;padding:14px 10px;text-align:center;
-  background:rgba(200,169,81,0.03);}
-.fp.winner{border-color:var(--gold);background:var(--gold-pale);
-  box-shadow:0 0 20px rgba(200,169,81,0.1);}
-.fp-name{font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.15em;
-  color:rgba(245,237,220,0.45);margin-bottom:4px;}
-.fp-score{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--parchment);letter-spacing:0.1em;}
-.fp-rating{font-family:'Cormorant Garamond',serif;font-size:0.78rem;font-style:italic;
-  color:rgba(245,237,220,0.45);margin-top:4px;}
-.history-title{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.18em;
-  color:rgba(200,169,81,0.4);margin:16px 0 8px;text-align:left;}
-.log-row{display:flex;justify-content:space-between;align-items:center;
-  padding:6px 0;border-bottom:1px solid rgba(200,169,81,0.07);
-  font-family:'DM Mono',monospace;font-size:0.65rem;}
-.log-row:last-child{border:none;}
-
-/* ── DIVIDER ── */
-.divider{height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);
-  margin:14px 0;}
-
-/* ── OPENING ROLL ── */
-.opening-wrap{text-align:center;}
-.opening-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-style:italic;
-  color:var(--parchment);margin-bottom:6px;}
-.opening-sub{font-family:'DM Mono',monospace;font-size:0.6rem;color:rgba(245,237,220,0.35);
-  letter-spacing:0.1em;margin-bottom:20px;line-height:1.6;}
-.opening-result{font-family:'Cormorant Garamond',serif;font-size:1rem;color:var(--gold);
-  min-height:1.4em;margin:10px 0;font-style:italic;}
+/* WIN */
+.win-wrap{text-align:center;padding:6px 0;}
+.win-eyebrow{font-family:'DM Mono',monospace;font-size:0.76rem;letter-spacing:0.18em;
+  color:rgba(200,169,81,0.38);margin-bottom:5px;}
+.win-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,9vw,3rem);
+  color:var(--gold);letter-spacing:0.22em;text-shadow:0 0 35px rgba(200,169,81,0.22);
+  margin-bottom:2px;}
+.win-sub{font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:1.05rem;color:rgba(245,237,220,0.35);margin-bottom:14px;}
+.podium{display:flex;flex-direction:column;gap:8px;margin:14px 0;}
+.pod{display:flex;align-items:center;gap:12px;border:1px solid var(--border);
+  border-radius:6px;padding:12px 14px;background:rgba(200,169,81,0.02);}
+.pod.first{border-color:var(--gold);background:var(--gold-pale);}
+.pod.second{border-color:rgba(200,200,200,0.25);background:rgba(200,200,200,0.03);}
+.pod.third{border-color:rgba(180,120,60,0.25);background:rgba(180,120,60,0.03);}
+.pod-rank{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;color:rgba(245,237,220,0.2);
+  letter-spacing:0.1em;width:28px;flex-shrink:0;}
+.pod.first .pod-rank{color:var(--gold);}
+.pod-info{flex:1;}
+.pod-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--parchment);}
+.pod-rating{font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:0.95rem;color:rgba(245,237,220,0.38);}
+.pod-score{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:0.1em;color:var(--parchment);}
+.pod.first .pod-score{color:var(--gold);}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin:12px 0;}
+.hist-title{font-family:'DM Mono',monospace;font-size:0.72rem;letter-spacing:0.15em;
+  color:rgba(200,169,81,0.32);margin:12px 0 7px;text-align:left;}
+.hist-row{display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;border-bottom:1px solid rgba(200,169,81,0.05);
+  font-family:'DM Mono',monospace;font-size:0.72rem;}
+.hist-row:last-child{border:none;}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- HEADER -->
-  <div class="app-header">
+  <div class="hdr">
     <div class="logo">ETHOS</div>
-    <div class="logo-sub" id="logo-sub">Good intentions meet real decisions</div>
+    <div class="byline">Good intentions meet real decisions</div>
   </div>
 
-  <!-- ══ SETUP SCREEN ══ -->
+  <!-- ══ SETUP ══ -->
   <div class="screen active" id="s-setup">
-    <div style="margin-top:10px;">
-      <p class="setup-title">Who are you?</p>
-      <p class="setup-sub">YOUR NAME WILL BE JUDGED BY HISTORY</p>
-      <label class="field-label">YOUR NAME</label>
-      <input class="field-input" id="human-name" type="text" placeholder="Enter your name" value="Player">
-      <label class="level-label">DIFFICULTY LEVEL</label>
-      <div class="level-grid">
-        <div class="lv on" data-lv="explorer" onclick="pickLevel(this)">
-          <span class="lv-em">🌟</span>
-          <span class="lv-name">Explorer</span>
-          <span class="lv-age">Ages 6 – 10</span>
-          <span class="lv-tag">Everyday choices,<br>simple words</span>
-        </div>
-        <div class="lv" data-lv="challenger" onclick="pickLevel(this)">
-          <span class="lv-em">🔥</span>
-          <span class="lv-name">Challenger</span>
-          <span class="lv-age">Ages 11 – 13</span>
-          <span class="lv-tag">School & social,<br>peer pressure</span>
-        </div>
-        <div class="lv" data-lv="strategist" onclick="pickLevel(this)">
-          <span class="lv-em">⚡</span>
-          <span class="lv-name">Strategist</span>
-          <span class="lv-age">Ages 14 – 17</span>
-          <span class="lv-tag">Real-world stakes,<br>nuanced trade-offs</span>
-        </div>
-        <div class="lv" data-lv="master" onclick="pickLevel(this)">
-          <span class="lv-em">⚖️</span>
-          <span class="lv-name">Master</span>
-          <span class="lv-age">Ages 18+</span>
-          <span class="lv-tag">Philosophy & power,<br>no easy answers</span>
-        </div>
+    <p class="setup-title">Set up your game</p>
+    <p class="setup-sub">STRATEGIST LEVEL · AGES 14+</p>
+
+    <label class="lbl">NUMBER OF PLAYERS</label>
+    <div class="pick-row" id="player-count-row">
+      <div class="popt" data-v="1" onclick="pickPlayers(this)">
+        <span class="popt-val">1</span>
+        <span class="popt-lbl">Solo</span>
       </div>
-      <button class="btn" onclick="goSetup()">BEGIN →</button>
-    </div>
-  </div>
-
-  <!-- ══ OPENING ROLL ══ -->
-  <div class="screen" id="s-opening">
-    <div class="card opening-wrap">
-      <p class="opening-title">Roll to Set the Limit</p>
-      <p class="opening-sub">ROLL TWO DICE — RESULT × 10 = TOTAL TURNS<br>HIGHEST ROLL GOES FIRST</p>
-      <div class="dice-row">
-        <div class="die" id="open-d1">?</div>
-        <div class="die" id="open-d2">?</div>
+      <div class="popt" data-v="2" onclick="pickPlayers(this)">
+        <span class="popt-val">2</span>
+        <span class="popt-lbl">Two</span>
       </div>
-      <div class="opening-result" id="open-result">—</div>
-      <button class="btn" id="open-btn" onclick="doOpeningRoll()">ROLL TO START</button>
+      <div class="popt" data-v="3" onclick="pickPlayers(this)">
+        <span class="popt-val">3</span>
+        <span class="popt-lbl">Three</span>
+      </div>
+    </div>
+
+    <div class="name-fields" id="name-fields">
+      <label class="lbl">PLAYER NAMES</label>
+      <input class="finput" id="n1" type="text" placeholder="Player 1" value="Player 1">
+      <input class="finput" id="n2" type="text" placeholder="Player 2" style="display:none">
+      <input class="finput" id="n3" type="text" placeholder="Player 3" style="display:none">
+    </div>
+
+    <label class="lbl">TIME PER PLAYER</label>
+    <div class="pick-row" id="time-row">
+      <div class="popt" data-v="2" onclick="pickTime(this)">
+        <span class="popt-val">2</span>
+        <span class="popt-lbl">min</span>
+      </div>
+      <div class="popt" data-v="5" onclick="pickTime(this)">
+        <span class="popt-val">5</span>
+        <span class="popt-lbl">min</span>
+      </div>
+      <div class="popt" data-v="10" onclick="pickTime(this)">
+        <span class="popt-val">10</span>
+        <span class="popt-lbl">min</span>
+      </div>
+      <div class="popt" data-v="15" onclick="pickTime(this)">
+        <span class="popt-val">15</span>
+        <span class="popt-lbl">min</span>
+      </div>
+    </div>
+
+    <button class="btn" onclick="startGame()">BEGIN →</button>
+  </div>
+
+  <!-- ══ PASS SCREEN ══ -->
+  <div class="screen" id="s-pass">
+    <div class="pass-wrap">
+      <div class="pass-sub">Hand the phone to</div>
+      <div class="pass-name" id="pass-name">—</div>
+      <div class="pass-time" id="pass-time">5:00 remaining</div>
+      <button class="btn big" onclick="startMyTurn()">START MY TURN →</button>
     </div>
   </div>
 
-  <!-- ══ BUILDING SCREEN ══ -->
-  <div class="screen" id="s-build">
-    <div class="card build-wrap">
-      <p class="build-title">Assembling Your World…</p>
-      <div class="build-status" id="build-status">Initialising</div>
-      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-      <div class="build-log" id="build-log"></div>
-    </div>
-  </div>
-
-  <!-- ══ GAME SCREEN ══ -->
+  <!-- ══ GAME ══ -->
   <div class="screen" id="s-game">
-
     <!-- HUD -->
-    <div class="hud" id="hud">
-      <div class="hud-player">
-        <div class="hud-name" id="hud-hname">YOU</div>
-        <div class="hud-score" id="hud-hscore">0</div>
-      </div>
-      <div class="hud-center">
-        <div class="hud-level" id="hud-level">⚖️</div>
-        <div class="hud-round" id="hud-round">R·1</div>
-        <div class="hud-turns" id="hud-turns">— TURNS</div>
-      </div>
-      <div class="hud-player right">
-        <div class="hud-name">AI</div>
-        <div class="hud-score" id="hud-ascore">0</div>
-      </div>
+    <div class="hud">
+      <div class="hud-players" id="hud-players"></div>
     </div>
-
-    <!-- Turn strip -->
-    <div class="turn-strip human" id="turn-strip" style="margin-top:12px;">
-      <div class="turn-dot"></div>
-      <span id="turn-text">Your turn</span>
-    </div>
-
-    <!-- Dynamic panels — all injected here -->
-    <div id="game-panels"></div>
-
+    <div id="panels"></div>
   </div>
 
-  <!-- ══ WIN SCREEN ══ -->
+  <!-- ══ WIN ══ -->
   <div class="screen" id="s-win">
     <div class="win-wrap">
-      <div class="win-eyebrow" id="win-reason">GAME OVER</div>
+      <div class="win-eyebrow">GAME OVER</div>
       <div class="win-title" id="win-title">—</div>
-      <div class="final-grid" id="final-grid"></div>
+      <div class="win-sub" id="win-sub"></div>
+      <div class="podium" id="podium"></div>
       <div class="divider"></div>
-      <div class="history-title">▸ ROUND HISTORY</div>
-      <div id="history-log"></div>
-      <div style="margin-top:20px;"><button class="btn" onclick="resetGame()">PLAY AGAIN</button></div>
+      <div class="hist-title">▸ ROUND HISTORY</div>
+      <div id="hist-log"></div>
+      <div style="margin-top:16px;"><button class="btn" onclick="resetGame()">PLAY AGAIN</button></div>
     </div>
   </div>
 
-</div><!-- /app -->
+</div>
 
 <script>
-// ══════════════════════════════════════════════════════
-// LEVEL CONFIG
-// ══════════════════════════════════════════════════════
-const LEVELS = {
-  explorer:{
-    name:'Explorer',icon:'🌟',age:'6–10',
-    tokEnt:1200,tokScene:110,tokResp:180,tokJudge:200,tokArgue:150,tokSelf:140,
-    entityPrompt:`Generate exactly 24 unique fictional entities for a children's ethics game (ages 6-10).
-EVERY entity must be from a young child's real daily world. Absolutely NO corporations, governments, military, finance, crime, or adult institutions.
-
-Categories to draw from:
-- Named classmates or school friends ("Tyler from 3B", "Mia the New Kid")
-- Teachers and school staff ("Mr. Fenn the PE Teacher", "Ms. Opal the Librarian")  
-- Family members ("Grandma Rosa", "Big Brother Jake", "Baby Sister Cleo")
-- Neighborhood characters ("Old Mr. Briggs Next Door", "The Ice Cream Lady")
-- Pets and animals ("Biscuit the Rescue Dog", "The Class Hamster Percy")
-- Sports teams and coaches ("Coach Petey's Soccer Team", "The Fireflies T-Ball Team")
-- Invented video game characters ("Zarlo from Planet Jump", "Princess Flicker")
-- Invented cartoon characters ("Captain Snugglepaws", "The Wobblebot Gang")
-- Playground and school places ("The Lunch Table by the Window", "The Big Slide Crew")
-- Kid influencers/YouTubers ("Benny's Toy Reviews Channel", "The Crafty Twins Show")
-- Local kid-friendly places ("Sunny Scoops Ice Cream", "Pebble Park Playground")
-- School events ("The Science Fair Committee", "The Talent Show Panel")
-
-Keep names fun, simple, under 20 characters. Flavor: 6-8 warm words describing them.`,
-    scenarioPrompt:`Write for a 6-10 year old. MAX 2 very short sentences. Use the simplest everyday words. The situation must be something a child actually experiences: sharing, telling the truth, being kind, fairness at school or play. End with ONE simple question: "What do you do?" Never use adult concepts.`,
-    responseGuide:`You are playing as a child age 6-10. Answer in 1-2 very short simple sentences a child would say. Use simple words.`,
-    judgePrompt:`Judge a child age 6-10. Be warm, kind, encouraging. Use simple words. 1-2 short sentences max for verdict. best_answer: 1 simple sentence.`,
-    arguePrompt:`A young child is making their case. Be very gentle and kind. 1-2 simple sentences.`,
-    selfPrompt:`1-2 very short simple sentences for self_assessment. what_i_missed: 1 brief simple sentence.`
-  },
-  challenger:{
-    name:'Challenger',icon:'🔥',age:'11–13',
-    tokEnt:1300,tokScene:160,tokResp:300,tokJudge:280,tokArgue:200,tokSelf:200,
-    entityPrompt:`Generate exactly 24 fictional entities for an ethics game (ages 11-13).
-Every entity must feel real to a young teen's world. Nothing too adult or corporate.
-
-Categories:
-- School social groups ("The Popular Table", "Drama Club Inner Circle")
-- Teachers/coaches/staff ("Coach Ramos", "Vice Principal Strick")
-- Social media figures (invented) ("@sparkle_maya", "The Gamer Bros Channel")
-- Gaming groups (invented) ("Clan Nexus", "The BlastForce Squad")
-- Sports teams ("The River Hawks Soccer Team", "East Side Swim Club")
-- Family dynamics ("Dad's New Girlfriend", "Cousin Tyler Who's Always Right")
-- Part-time gigs ("Mrs. Chen's Babysitting Job", "The Lawn Mowing Crew")
-- Local spots ("GameStop on Maple", "The Bubble Tea Place", "The Corner Park")
-- Online communities (invented) ("The Fan Art Discord", "The Minecraft Realm")
-- School events ("The Student Council Election", "The Grade 7 Talent Show")
-- Peer situations ("The Lunch Table Clique", "The Group Chat")
-- Youth programs ("Saturday Soccer League", "The Art Summer Camp")
-
-Under 22 chars. Flavor: 7-9 words capturing their vibe.`,
-    scenarioPrompt:`Write for an 11-13 year old. 2-3 clear sentences. Use relatable language about school, friendships, social media, fairness, peer pressure, or family. End with a direct question. No adult complexity.`,
-    responseGuide:`You are playing for a young teen (age 11-13). 2-3 clear direct sentences. Take a real stance in language a young teen would use.`,
-    judgePrompt:`Judge a young teen age 11-13. Fair and encouraging. Clear language. Verdict: 2 sentences max. best_answer: 1-2 clear sentences.`,
-    arguePrompt:`A young teen argues their case. Be fair and clear. 2 sentences.`,
-    selfPrompt:`self_assessment: 2 clear sentences. what_i_missed: 1 sentence.`
-  },
-  strategist:{
-    name:'Strategist',icon:'⚡',age:'14–17',
-    tokEnt:1400,tokScene:220,tokResp:550,tokJudge:380,tokArgue:280,tokSelf:280,
-    entityPrompt:`Generate exactly 24 fictional entities for an ethics game (ages 14-17).
-Mix personal-world and early real-world entities. Show a teenager's expanding awareness.
-
-Categories:
-- Social media/influencers (invented) ("@truthbomb.tae", "The Hustle Bros Podcast")
-- High school dynamics ("Student Council President", "The Honor Roll Clique", "The Debate Team")
-- Part-time employers ("Burger Barn Manager", "The Tutoring Agency", "Café Lumiere")
-- Gaming/esports (invented) ("Team Vortex Esports", "The Ranked Grind Community")
-- Youth activism ("School Climate Strike Group", "The Equity Alliance Club")
-- College prep ("Prestige SAT Prep Co.", "The Ivy League Dream Forum")
-- Local community ("City Youth Council", "Neighborhood Watch Captain")
-- Small businesses ("Family Restaurant Diaz", "Dad's Hardware Shop")
-- Music/arts (invented) ("The Unsigned Band", "The Street Art Collective")
-- Family conflicts ("The Family Business", "Divorced Parents' Lawyer")
-- Ethics dilemmas ("The Academic Integrity Board", "The School Newspaper")
-- Tech and apps (invented) ("The Viral App Startup", "The Study Group App")
-
-Under 22 chars. Flavor: 8-10 words capturing their role and stakes.`,
-    scenarioPrompt:`Write for a 14-17 year old. 2-3 sentences. Topics: social justice, loyalty vs. authority, digital ethics, environment, fairness, identity. Clear language with real nuance. End with a pointed question.`,
-    responseGuide:`Play for a thoughtful teenager (14-17). 2-4 clear sentences. Take a real, reasoned stance.`,
-    judgePrompt:`Judge a teenager 14-17. Real ethical standard, acknowledge their perspective. Verdict: 2-3 sentences. best_answer: 1-2 sentences.`,
-    arguePrompt:`A teenager argues their score. Engage seriously. 2-3 sentences.`,
-    selfPrompt:`self_assessment: 2-3 sentences. what_i_missed: 1 sentence.`
-  },
-  master:{
-    name:'Master',icon:'⚖️',age:'18+',
-    tokEnt:1400,tokScene:320,tokResp:900,tokJudge:550,tokArgue:380,tokSelf:450,
-    entityPrompt:`Generate exactly 24 unique fictional entities for a sophisticated ethics board game.
-Maximum variety — no more than 2 from any single category.
-
-Spread across:
-- Military commanders (Admiral, General, Colonel — fictional specific names)
-- Heads of state, prime ministers, authoritarian rulers
-- Astronauts, orbital station crews, deep-space mission leads
-- Scientists, AI researchers, bioethicists, inventors
-- Religious leaders, cult founders, theological institutions
-- Surgeons, hospital ethics boards, pharmaceutical executives
-- Judges, international prosecutors, whistleblowers
-- Athletes, sports dynasties, doping scandal figures
-- Investigative journalists, propaganda outlets, censorship bureaus
-- Intelligence officers, double agents, surveillance agencies
-- Organized crime bosses, hackers, trafficking networks
-- Tech monopolies, data brokers, AI corporations
-- Central banks, sovereign wealth funds, dark money channels
-- Space agencies, Mars colonies, weapons satellites
-- Extremist ideological movements, revolutionary councils
-- Ancient family dynasties, inherited political machines
-- Environmental collapse zones, climate tipping-point bodies
-- Bioweapons labs, pandemic origin committees
-- Wildly unexpected: sentient AI councils, post-human collectives, etc.
-
-Specific invented names only. Under 22 chars. Flavor: 8-10 words of atmosphere and moral weight.`,
-    scenarioPrompt:`Create a vivid scenario with genuine institutional or philosophical stakes. Real upside, real moral cost, real consequences. 2-3 punchy sentences. End with one direct question. No easy answer exists.`,
-    responseGuide:`You are debating at the highest ethical level. Specific, well-reasoned, willing to defend a controversial position. 2-4 paragraphs.`,
-    judgePrompt:`Score rigorously. Reward precise reasoning, penalise evasion and empty moralising. Verdict: 2-3 sentences. best_answer: 1-2 sentences.`,
-    arguePrompt:`Human argues against score. Reward genuine philosophical insight, not rhetorical sleight-of-hand. 2-3 sentences.`,
-    selfPrompt:`self_assessment: 2-3 honest, self-critical sentences. what_i_missed: 1 sharp sentence.`
-  }
-};
-
-// Chance cards (1-in-8 trigger)
-const CHANCE_CARDS = [
-  {icon:'🌟',title:'FREE CHOICE',body:'You may invent your own scenario topic for this turn.',effect:'Describe any ethical situation you want.',cls:'good',action:'free'},
-  {icon:'🔒',title:'HOUSE ARREST',body:'Your ethical track record has drawn scrutiny.',effect:'-10 points if your average is below the game average.',cls:'bad',action:'arrest'},
-  {icon:'⚖️',title:'SUE A PLAYER',body:'You believe your opponent has behaved poorly.',effect:'-10 points to AI if their last score was below their average.',cls:'neutral',action:'sue'},
-  {icon:'🏛️',title:'CLASS ACTION',body:'The public has taken notice of your overall conduct.',effect:'-10 points to you if your average is below the game average.',cls:'bad',action:'class'},
-  {icon:'🎁',title:'MORAL WINDFALL',body:'An unexpected act of integrity has been recognised.',effect:'+5 bonus points — no scenario required.',cls:'good',action:'bonus'},
-  {icon:'🔄',title:'ROLE REVERSAL',body:'The tables have turned. The AI faces your scrutiny.',effect:'You write the scenario for the AI this turn.',cls:'neutral',action:'reverse'},
-  {icon:'🎯',title:'DOUBLE STAKES',body:'This turn counts for twice the points.',effect:'Score is multiplied ×2.',cls:'neutral',action:'double'},
-  {icon:'🛡️',title:'IMMUNITY',body:'Your recent honesty has earned you protection.',effect:'Skip the scenario — take +3 points automatically.',cls:'good',action:'immunity'},
+// ══ SCENARIOS ══
+const SCENARIOS = [
+  {entity:"School Newspaper",icon:"📰",flavor:"small paper, real editorial power",situation:"You have proof a teacher is falsifying grades. Publishing hurts people — silence protects the unfair system.",options:[{text:"Publish — truth matters more than comfort.",score:10,cls:"best",label:"Principled",why:"Integrity of the system protects everyone long-term."},{text:"Tell the principal privately, let them handle it.",score:5,cls:"good",label:"Reasonable",why:"Proper channels, but risks a cover-up."},{text:"Do nothing — not your problem.",score:-3,cls:"poor",label:"Questionable",why:"Silence makes you complicit in ongoing unfairness."},{text:"Leak it anonymously to avoid risk.",score:-7,cls:"worst",label:"Harmful",why:"You benefit from truth without owning it."}]},
+  {entity:"Debate Team",icon:"🎓",flavor:"teaches you to argue any side — dangerous skill",situation:"You are assigned to argue a position you find morally wrong. Winning means your team goes to nationals.",options:[{text:"Argue it well — that is what debate is for.",score:10,cls:"best",label:"Principled",why:"Understanding opposing views is a core intellectual skill."},{text:"Tell your coach you are uncomfortable and ask to switch.",score:5,cls:"good",label:"Reasonable",why:"Honest about limits while respecting the team."},{text:"Fake illness to avoid the round.",score:-3,cls:"poor",label:"Questionable",why:"Avoids the problem rather than facing it."},{text:"Argue it but deliberately lose.",score:-7,cls:"worst",label:"Harmful",why:"Dishonest to teammates who depend on your full effort."}]},
+  {entity:"Café Lumière",icon:"☕",flavor:"your first real job, complicated politics",situation:"Your manager asks you to tell customers a sold-out item is available so they stay and order something else.",options:[{text:"Refuse — lying to customers is wrong regardless of orders.",score:10,cls:"best",label:"Principled",why:"Your integrity is not your employer's to spend."},{text:"Do it once but make clear you will not do it again.",score:5,cls:"good",label:"Reasonable",why:"Sets a boundary while avoiding immediate conflict."},{text:"Do it — you need the job and it seems minor.",score:-3,cls:"poor",label:"Questionable",why:"Small lies normalise bigger ones."},{text:"Report the manager to head office immediately.",score:-7,cls:"worst",label:"Harmful",why:"Disproportionate — skips direct conversation first."}]},
+  {entity:"Academic Board",icon:"⚖️",flavor:"quiet enforcers of integrity in an easy-cheating era",situation:"You saw your best friend cheat on an exam. The honour code requires you to report it.",options:[{text:"Talk to your friend first — urge them to confess.",score:10,cls:"best",label:"Principled",why:"Gives them agency while still holding them accountable."},{text:"Report it as the code requires.",score:5,cls:"good",label:"Reasonable",why:"Follows the rules, but skips a chance for them to do right."},{text:"Say nothing — loyalty comes first.",score:-3,cls:"poor",label:"Questionable",why:"Loyalty that protects dishonesty is not real friendship."},{text:"Tip off the teacher anonymously.",score:-7,cls:"worst",label:"Harmful",why:"Betrays your friend while avoiding personal responsibility."}]},
+  {entity:"Student Council",icon:"🏛️",flavor:"a little power that reveals a lot about character",situation:"You hold the casting vote on a policy that benefits your friend group but is unfair to others.",options:[{text:"Vote against it — fairness cannot depend on who your friends are.",score:10,cls:"best",label:"Principled",why:"Leadership means serving everyone, not just allies."},{text:"Propose amending the policy to be fair to both groups.",score:5,cls:"good",label:"Reasonable",why:"Creative leadership that tries to serve everyone."},{text:"Abstain to avoid conflict.",score:-3,cls:"poor",label:"Questionable",why:"Having power and refusing to use it for fairness is a quiet failure."},{text:"Vote for it — your friends elected you.",score:-7,cls:"worst",label:"Harmful",why:"Using power to reward allies over fairness is corrupt."}]},
+  {entity:"@truthbomb.tae",icon:"📱",flavor:"calls out injustice online — sometimes accurately",situation:"A viral post about your school is partly false but finally getting bullying taken seriously.",options:[{text:"Correct the false parts even if it reduces pressure on the school.",score:10,cls:"best",label:"Principled",why:"Truth is not a tool — lies for good ends still corrode trust."},{text:"Correct the facts but keep pressing the school on the real issue.",score:5,cls:"good",label:"Reasonable",why:"Stays honest while keeping the real issue alive."},{text:"Stay silent and let the pressure do its work.",score:-3,cls:"poor",label:"Questionable",why:"Allowing misinformation to spread makes you complicit."},{text:"Share the post to amplify it.",score:-7,cls:"worst",label:"Harmful",why:"Knowingly spreading falsehoods to achieve goals is dishonest."}]},
+  {entity:"Burger Barn",icon:"🍔",flavor:"rules, favourites, and the schedule held over you",situation:"A colleague takes food without paying. Management has not noticed. They offer to share with you.",options:[{text:"Decline and tell them quietly it is stealing and to stop.",score:10,cls:"best",label:"Principled",why:"Clear and honest without involving management unnecessarily."},{text:"Report it to management.",score:5,cls:"good",label:"Reasonable",why:"Correct, though a direct conversation first is fairer."},{text:"Decline but say nothing — not your problem.",score:-3,cls:"poor",label:"Questionable",why:"Avoiding wrongdoing but ignoring ongoing harm."},{text:"Accept — the company can afford it.",score:-7,cls:"worst",label:"Harmful",why:"Rationalising theft does not make it acceptable."}]},
+  {entity:"The Viral App",icon:"💻",flavor:"built in a bedroom, now it is everywhere",situation:"Your friend's app collects user data without clear consent. Thousands of teens use it.",options:[{text:"Tell your friend to fix it or you will report it.",score:10,cls:"best",label:"Principled",why:"Protects users while giving your friend a chance to do right."},{text:"Report it to the app store right away.",score:5,cls:"good",label:"Reasonable",why:"Protects users but skips giving your friend a chance first."},{text:"Say nothing — it is their app and their responsibility.",score:-3,cls:"poor",label:"Questionable",why:"Knowing about harm and staying silent makes you part of it."},{text:"Post about it publicly to warn users.",score:-7,cls:"worst",label:"Harmful",why:"Public shaming before a private conversation is disproportionate."}]},
+  {entity:"School Climate Group",icon:"🌱",flavor:"passionate, organised, starting to scare the administration",situation:"Your group wants to skip school to protest. It will make news but some members risk penalties they cannot afford.",options:[{text:"Let each member decide — respect individual risk.",score:10,cls:"best",label:"Principled",why:"Leadership means protecting autonomy, not demanding sacrifice."},{text:"Hold the protest after school to protect everyone.",score:5,cls:"good",label:"Reasonable",why:"Lower impact but protects the most vulnerable members."},{text:"Cancel — no cause is worth anyone failing.",score:-3,cls:"poor",label:"Questionable",why:"Overcorrects — the cause may well be worth some inconvenience."},{text:"Go as a group — solidarity matters more than individual risk.",score:-7,cls:"worst",label:"Harmful",why:"Pressuring members into consequences they cannot bear is wrong."}]},
+  {entity:"Tutoring Agency",icon:"📚",flavor:"matches desperate students with tutors who know the tests too well",situation:"A client asks you to write their essay, not just help them. The money would really help you.",options:[{text:"Refuse — writing it for them is cheating, not tutoring.",score:10,cls:"best",label:"Principled",why:"Your job is to help them learn, not to cheat on their behalf."},{text:"Help them outline and draft together — but not write it.",score:5,cls:"good",label:"Reasonable",why:"Stays ethical while providing real help."},{text:"Write part of it and call it guidance.",score:-3,cls:"poor",label:"Questionable",why:"Dishonest framing of what is still essentially their work."},{text:"Write it — they are desperate and you need the money.",score:-7,cls:"worst",label:"Harmful",why:"Rationalising cheating harms them academically long-term."}]},
+  {entity:"Team Vortex",icon:"🎮",flavor:"sponsorships, contracts, and a conduct policy",situation:"You discover a teammate is using a cheat program in ranked matches. Reporting ends the winning streak.",options:[{text:"Report them — wins built on cheating are worthless.",score:10,cls:"best",label:"Principled",why:"Integrity of the game matters more than a streak."},{text:"Confront them privately and demand they stop.",score:5,cls:"good",label:"Reasonable",why:"Gives them a chance to fix it before escalating."},{text:"Ask them to only cheat in unranked matches.",score:-3,cls:"poor",label:"Questionable",why:"Trying to contain dishonesty rather than stopping it."},{text:"Say nothing — everyone cheats at this level.",score:-7,cls:"worst",label:"Harmful",why:"Normalising cheating destroys fair competition for everyone."}]},
+  {entity:"Equity Alliance",icon:"✊",flavor:"fights for fairness and occasionally among themselves",situation:"A member makes a racist comment in your meeting. They are also your biggest donor.",options:[{text:"Call it out immediately, regardless of consequences.",score:10,cls:"best",label:"Principled",why:"An equity group that tolerates racism has failed its purpose."},{text:"Speak to them privately after the meeting.",score:5,cls:"good",label:"Reasonable",why:"Addresses it without public confrontation — though risks it being buried."},{text:"Make a general statement about club values without naming them.",score:-3,cls:"poor",label:"Questionable",why:"Avoids the real confrontation while appearing to address it."},{text:"Let it pass — you need their funding.",score:-7,cls:"worst",label:"Harmful",why:"Silence in exchange for money betrays your mission."}]},
+  {entity:"Hardware Shop",icon:"🔧",flavor:"third generation, in debt, hoping you will take it over",situation:"You discover your family business has been overcharging elderly customers for years. Your parents see no problem.",options:[{text:"Tell your parents it is wrong and push for fair pricing.",score:10,cls:"best",label:"Principled",why:"Family loyalty does not override basic fairness to customers."},{text:"Quietly correct prices when you serve customers yourself.",score:5,cls:"good",label:"Reasonable",why:"Takes personal action while avoiding family conflict."},{text:"Accept it — it is their business.",score:-3,cls:"poor",label:"Questionable",why:"Passive complicity is still complicity."},{text:"Report the business to consumer protection authorities.",score:-7,cls:"worst",label:"Harmful",why:"Escalating without attempting a family conversation first is disproportionate."}]},
+  {entity:"Prestige SAT Prep",icon:"🏫",flavor:"sells the dream of elite college at an uncomfortable price",situation:"A test prep company offers you leaked exam questions. Using them guarantees your scholarship.",options:[{text:"Refuse — a scholarship built on cheating is built on sand.",score:10,cls:"best",label:"Principled",why:"What you gain dishonestly, you own dishonestly."},{text:"Report the company for having leaked questions.",score:5,cls:"good",label:"Reasonable",why:"Protects other students and addresses the source."},{text:"Keep them but do not use them, just in case.",score:-3,cls:"poor",label:"Questionable",why:"Possession alone is ethically compromised."},{text:"Use them — everyone with money gets an unfair advantage anyway.",score:-7,cls:"worst",label:"Harmful",why:"Two wrongs do not make a right."}]},
+  {entity:"City Youth Council",icon:"🏛️",flavor:"real power, real politics, real disappointments",situation:"You can pass a motion that genuinely helps your community — but it requires misleading the council about costs.",options:[{text:"Present the full cost honestly and make the case on merit.",score:10,cls:"best",label:"Principled",why:"Democratic decisions must be based on honest information."},{text:"Delay the vote until you find legitimate funding.",score:5,cls:"good",label:"Reasonable",why:"Avoids dishonesty while still pursuing the good outcome."},{text:"Abstain and let someone else propose it properly.",score:-3,cls:"poor",label:"Questionable",why:"Avoids personal wrongdoing but abandons leadership."},{text:"Mislead them — the outcome justifies it here.",score:-7,cls:"worst",label:"Harmful",why:"Deceiving the body you serve destroys the trust that makes governance work."}]},
+  {entity:"Unsigned Band",icon:"🎵",flavor:"three years of grinding and one offer that feels like a trap",situation:"A label offers a contract but demands you change your sound to something more commercial.",options:[{text:"Negotiate — accept some changes but protect your core identity.",score:10,cls:"best",label:"Principled",why:"Compromise is not surrender — smart artists protect what matters most."},{text:"Refuse entirely — your art is not for sale.",score:5,cls:"good",label:"Reasonable",why:"Integrity preserved, but the opportunity cost may be high."},{text:"Accept everything — success requires sacrifice.",score:-3,cls:"poor",label:"Questionable",why:"Full commercial surrender rarely leads to lasting satisfaction."},{text:"Sign, then make the music you want once you are famous.",score:-7,cls:"worst",label:"Harmful",why:"Signing a contract you plan to breach is dishonest from the start."}]},
+  {entity:"Street Art Collective",icon:"🎨",flavor:"creates beauty illegally and debates whether that matters",situation:"You are offered a legal wall to paint, but the location was chosen to gentrify the community you paint for.",options:[{text:"Decline and explain publicly why.",score:10,cls:"best",label:"Principled",why:"Art that knowingly harms your community is a betrayal."},{text:"Accept but use the wall to critique gentrification directly.",score:5,cls:"good",label:"Reasonable",why:"Turns the platform against its intended purpose — bold."},{text:"Accept — legal space is rare and you should take it.",score:-3,cls:"poor",label:"Questionable",why:"Prioritises the group's benefit over the community's harm."},{text:"Let the group vote without sharing your concerns.",score:-7,cls:"worst",label:"Harmful",why:"Withholding important information from a decision is manipulation."}]},
+  {entity:"Study Group App",icon:"📱",flavor:"designed for collaboration, mostly used to share answers",situation:"The app makes sharing full answers easy. Most students do it but call it helping.",options:[{text:"Only share your thinking process, not your answers.",score:10,cls:"best",label:"Principled",why:"Real help teaches. Giving answers just transfers the work."},{text:"Use others' answers to check your own after you finish.",score:5,cls:"good",label:"Reasonable",why:"Borderline, but preserves your own learning process."},{text:"Share answers with close friends only.",score:-3,cls:"poor",label:"Questionable",why:"The ethics do not change based on friendship."},{text:"Share freely — the school should design better assignments.",score:-7,cls:"worst",label:"Harmful",why:"The school's design flaws do not authorise academic dishonesty."}]},
+  {entity:"Neighbourhood Watch",icon:"👀",flavor:"means well, keeps detailed notes on everyone",situation:"The captain asks you to monitor a family of a different ethnicity — clearly without cause.",options:[{text:"Refuse and name directly that his suspicion seems based on bias.",score:10,cls:"best",label:"Principled",why:"Naming bias clearly is uncomfortable but necessary."},{text:"Refuse without explaining why.",score:5,cls:"good",label:"Reasonable",why:"Protects the family but misses a chance to challenge the bias."},{text:"Watch but only report genuinely suspicious behaviour.",score:-3,cls:"poor",label:"Questionable",why:"Participating in a biased request even partially legitimises it."},{text:"Agree and report nothing — play along to keep peace.",score:-7,cls:"worst",label:"Harmful",why:"Pretending to comply with a biased request makes you complicit."}]},
+  {entity:"Restaurant Diaz",icon:"🍽️",flavor:"built from nothing, now under pressure",situation:"You discover your family restaurant is not paying workers the legal minimum wage. Your parents say it is the only way to survive.",options:[{text:"Tell your parents it is illegal and wrong — push for change.",score:10,cls:"best",label:"Principled",why:"Workers' rights are not negotiable regardless of business pressure."},{text:"Research legal options for small businesses and present them.",score:5,cls:"good",label:"Reasonable",why:"Constructive — helps fix the problem rather than just naming it."},{text:"Stay out of it — their business, their decision.",score:-3,cls:"poor",label:"Questionable",why:"Knowing about wage theft and doing nothing is complicity."},{text:"Report them to labour authorities anonymously.",score:-7,cls:"worst",label:"Harmful",why:"Reporting family without any conversation first is a last resort, not a first step."}]},
+  {entity:"Honor Code Officer",icon:"⚖️",flavor:"a peer-elected role nobody wanted until it had consequences",situation:"You catch a student cheating who is dealing with a serious family crisis. Rules require a failing grade.",options:[{text:"Follow the rules but advocate strongly for leniency.",score:10,cls:"best",label:"Principled",why:"Uphold the system while using your voice to humanise it."},{text:"Apply the rule exactly as written.",score:5,cls:"good",label:"Reasonable",why:"Consistent enforcement matters but ignores the human context."},{text:"Let it go given what they are going through.",score:-3,cls:"poor",label:"Questionable",why:"Well-intentioned, but inconsistent enforcement undermines the whole system."},{text:"Cover it up entirely — rules should have exceptions.",score:-7,cls:"worst",label:"Harmful",why:"Secret exceptions corrupt the integrity of the code you were chosen to uphold."}]},
+  {entity:"The Hustle Podcast",icon:"🎙️",flavor:"two dropouts who turned hustle culture into a media empire",situation:"A popular podcast will feature you — if you endorse a product you have not tried and do not believe in.",options:[{text:"Decline — your credibility is worth more than the exposure.",score:10,cls:"best",label:"Principled",why:"Endorsing things you do not believe in is the start of losing yourself."},{text:"Ask to try it first and only endorse if you genuinely like it.",score:5,cls:"good",label:"Reasonable",why:"Honest compromise that keeps your integrity intact."},{text:"Accept but add a small disclaimer nobody will read.",score:-3,cls:"poor",label:"Questionable",why:"Technically transparent but practically still deceptive."},{text:"Accept — it is just marketing, everyone does it.",score:-7,cls:"worst",label:"Harmful",why:"Misleading your audience for personal gain betrays their trust."}]},
+  {entity:"Ranked Grind",icon:"🕹️",flavor:"worships improvement and despises shortcuts",situation:"A junior player asks for coaching. Helping them will likely create competition that costs you your top rank.",options:[{text:"Help them fully — a rising tide lifts all boats.",score:10,cls:"best",label:"Principled",why:"Generosity that costs you something is the real kind."},{text:"Decline politely — competition is competition.",score:5,cls:"good",label:"Reasonable",why:"Honest about your limits, even if not the most generous choice."},{text:"Help with basics but hold back your advanced strategies.",score:-3,cls:"poor",label:"Questionable",why:"Partial help driven by self-protection is not genuine mentorship."},{text:"Give them deliberately wrong advice.",score:-7,cls:"worst",label:"Harmful",why:"Sabotaging someone who trusts you is a serious ethical violation."}]},
+  {entity:"Ivy League Forum",icon:"🏫",flavor:"anonymous students competing for prestige at any cost",situation:"You have access to another student's application essay that is far better than yours. You could adapt key ideas.",options:[{text:"Write your own essay — your authentic voice is what matters.",score:10,cls:"best",label:"Principled",why:"Authenticity is both ethical and strategically smarter."},{text:"Ask the student openly if you can discuss their approach.",score:5,cls:"good",label:"Reasonable",why:"Turns a potential breach into honest collaboration."},{text:"Use it as loose inspiration while keeping your own voice.",score:-3,cls:"poor",label:"Questionable",why:"The line between inspiration and theft is blurrier than it feels."},{text:"Copy it closely and change the wording.",score:-7,cls:"worst",label:"Harmful",why:"Plagiarism regardless of how many words you change."}]},
+  {entity:"School Newspaper",icon:"📰",flavor:"small paper, real editorial power",situation:"Your editor kills a story about racism in the sports programme because the coach advertises in the paper.",options:[{text:"Publish it on your own platform and explain why it was killed.",score:10,cls:"best",label:"Principled",why:"Journalism suppressed by advertiser pressure deserves daylight."},{text:"Escalate to the faculty advisor over the editor's head.",score:5,cls:"good",label:"Reasonable",why:"Works within the system before going outside it."},{text:"Rewrite it to be less critical so it gets through.",score:-3,cls:"poor",label:"Questionable",why:"Softening a true story to appease pressure is self-censorship."},{text:"Drop it — you do not want the conflict.",score:-7,cls:"worst",label:"Harmful",why:"Letting commercial interests silence important stories is a press failure."}]},
+  {entity:"Debate Team",icon:"🎓",flavor:"teaches you to argue any side — dangerous skill",situation:"You overhear a rival team's full strategy through a thin wall before the competition.",options:[{text:"Tell your coach and ask to move to a different room.",score:10,cls:"best",label:"Principled",why:"Removes the unfair advantage before it can corrupt the result."},{text:"Pretend you heard nothing and compete normally.",score:5,cls:"good",label:"Reasonable",why:"Tries to restore fairness but does not address the advantage."},{text:"Tell your teammates but tell them not to use it.",score:-3,cls:"poor",label:"Questionable",why:"Sharing information you should not have spread the problem."},{text:"Use what you heard — it was their fault for being overheard.",score:-7,cls:"worst",label:"Harmful",why:"Accidental advantage becomes deliberate unfairness the moment you use it."}]},
+  {entity:"Café Lumière",icon:"☕",flavor:"your first real job, complicated politics",situation:"A customer leaves a wallet with significant cash. Your coworker says split it — they are long gone.",options:[{text:"Hand it in and request it be held for the customer.",score:10,cls:"best",label:"Principled",why:"The money is not yours — absence does not change that."},{text:"Try to find the customer using ID in the wallet.",score:5,cls:"good",label:"Reasonable",why:"Proactive honesty, though going through someone's wallet has privacy issues."},{text:"Leave it on the counter and let someone else deal with it.",score:-3,cls:"poor",label:"Questionable",why:"Avoids wrongdoing but abandons the responsibility to help."},{text:"Split it — they should not have left it.",score:-7,cls:"worst",label:"Harmful",why:"Victim-blaming does not change the fact that taking it is theft."}]},
+  {entity:"Team Vortex",icon:"🎮",flavor:"sponsorships, contracts, and a conduct policy",situation:"Your team captain wants to publicly blame a loss on one player who made key errors, to protect team morale.",options:[{text:"Refuse — scapegoating damages trust far more than any loss.",score:10,cls:"best",label:"Principled",why:"Blame cultures destroy teams. Honest cultures build them."},{text:"Suggest a team debrief that addresses errors without singling anyone out.",score:5,cls:"good",label:"Reasonable",why:"Constructive approach that protects the individual."},{text:"Go along with it — it is the captain's call.",score:-3,cls:"poor",label:"Questionable",why:"Following orders does not remove your responsibility for unfairness."},{text:"Publicly defend the player, directly contradicting the captain.",score:-7,cls:"worst",label:"Harmful",why:"Public contradiction creates new conflict rather than resolving it."}]},
+  {entity:"City Youth Council",icon:"🏛️",flavor:"real power, real politics, real disappointments",situation:"A council member offers to back your proposal — if you support theirs, which you think is genuinely harmful.",options:[{text:"Decline and let your proposal stand on its own merits.",score:10,cls:"best",label:"Principled",why:"Trades that require endorsing harm compromise your integrity."},{text:"Negotiate — support a modified version that removes the harm.",score:5,cls:"good",label:"Reasonable",why:"Pragmatic politics that tries to improve the bad proposal."},{text:"Accept but vote against their proposal at the last moment.",score:-3,cls:"poor",label:"Questionable",why:"Deception in a negotiation is dishonest even if the outcome is better."},{text:"Accept the deal — politics requires compromise.",score:-7,cls:"worst",label:"Harmful",why:"Compromise is not the same as trading your vote on something harmful."}]},
+  {entity:"@truthbomb.tae",icon:"📱",flavor:"calls out injustice online — sometimes accurately",situation:"Your post calling out a classmate for racism goes viral. They now receive serious threats from strangers.",options:[{text:"Post asking followers to stop the threats while keeping the criticism up.",score:10,cls:"best",label:"Principled",why:"Accountability and safety are not mutually exclusive."},{text:"Publicly apologise for the post entirely.",score:5,cls:"good",label:"Reasonable",why:"Reduces harm but may be overcorrection if the criticism was fair."},{text:"Delete everything to stop the harassment.",score:-3,cls:"poor",label:"Questionable",why:"Erasing accountability to stop harassment you did not cause is not the answer."},{text:"Say nothing — you did not send the threats.",score:-7,cls:"worst",label:"Harmful",why:"When your words mobilise a crowd, you carry responsibility for what follows."}]},
+  {entity:"Burger Barn",icon:"🍔",flavor:"rules, favourites, and the schedule held over you",situation:"Your manager gives better shifts to employees who laugh at his inappropriate jokes. You are losing income.",options:[{text:"Report it to HR as a hostile work environment.",score:10,cls:"best",label:"Principled",why:"This is workplace misconduct. Formal channels exist for it."},{text:"Tell the manager directly his behaviour is inappropriate.",score:5,cls:"good",label:"Reasonable",why:"Direct conversation first is fair before escalating."},{text:"Start looking for a new job and say nothing.",score:-3,cls:"poor",label:"Questionable",why:"Protects yourself but leaves the problem in place for your coworkers."},{text:"Play along to get the better shifts.",score:-7,cls:"worst",label:"Harmful",why:"Participating in inappropriate behaviour to gain rewards is complicity."}]},
+  {entity:"Equity Alliance",icon:"✊",flavor:"fights for fairness and occasionally among themselves",situation:"Your group wants to ban a student for views they hold privately but have never expressed at meetings.",options:[{text:"Oppose the ban — punishing private beliefs rather than actions is wrong.",score:10,cls:"best",label:"Principled",why:"Thought policing undermines the open society equity groups claim to build."},{text:"Propose a warning system — ban only if they act on those views.",score:5,cls:"good",label:"Reasonable",why:"Balances community safety with proportionate response."},{text:"Support the ban — the group has to feel safe.",score:-3,cls:"poor",label:"Questionable",why:"Safety matters but this standard could be used to exclude anyone."},{text:"Support and actively help enforce the ban.",score:-7,cls:"worst",label:"Harmful",why:"Enforcing punishment for private beliefs is an authoritarian act."}]},
+  {entity:"Tutoring Agency",icon:"📚",flavor:"matches desperate students with tutors who know the tests too well",situation:"Another tutor gives students direct answers. They earn more than you as a result.",options:[{text:"Report it — it harms students and is unfair to honest tutors.",score:10,cls:"best",label:"Principled",why:"Dishonest competition that harms students cannot be ignored."},{text:"Talk to the other tutor first and ask them to stop.",score:5,cls:"good",label:"Reasonable",why:"Peer conversation before escalation is fair."},{text:"Do nothing — it is their choice how they tutor.",score:-3,cls:"poor",label:"Questionable",why:"When bad practice harms students, silence is not neutral."},{text:"Start doing the same to stay competitive.",score:-7,cls:"worst",label:"Harmful",why:"Matching unethical behaviour to compete is a race to the bottom."}]},
+  {entity:"School Climate Group",icon:"🌱",flavor:"passionate, organised, starting to scare the administration",situation:"A donor offers major funding but they run a fast fashion company with a poor environmental record.",options:[{text:"Decline — taking money from the problem undermines your credibility.",score:10,cls:"best",label:"Principled",why:"Your message is your most valuable asset."},{text:"Accept but require a public commitment to improvement.",score:5,cls:"good",label:"Reasonable",why:"Turns the relationship into leverage for real change."},{text:"Accept quietly and use the money for good.",score:-3,cls:"poor",label:"Questionable",why:"Greenwashing a polluter, even unintentionally, is still greenwashing."},{text:"Accept and publicly thank them as a partner.",score:-7,cls:"worst",label:"Harmful",why:"Legitimising a bad actor in exchange for money betrays your cause."}]},
+  {entity:"Academic Board",icon:"⚖️",flavor:"quiet enforcers of integrity in an easy-cheating era",situation:"You are asked to investigate a student you personally dislike. You know you cannot be fully objective.",options:[{text:"Recuse yourself and explain the personal conflict.",score:10,cls:"best",label:"Principled",why:"Knowing your bias and acting on it is a sign of real integrity."},{text:"Tell the board chair privately about your personal feelings.",score:5,cls:"good",label:"Reasonable",why:"Transparent with the chair — though recusal is still cleaner."},{text:"Serve but try extra hard to be fair.",score:-3,cls:"poor",label:"Questionable",why:"You cannot reliably compensate for bias you know exists."},{text:"Serve and publicly perform fairness.",score:-7,cls:"worst",label:"Harmful",why:"Performance of fairness is not the same as fairness."}]},
+  {entity:"The Viral App",icon:"💻",flavor:"built in a bedroom, now it is everywhere",situation:"Your app has a bug that only affects users in low-income areas. Fixing it delays a profitable feature launch.",options:[{text:"Fix the bug first — all users deserve equal service.",score:10,cls:"best",label:"Principled",why:"A bug that only affects poorer users is a bias problem too."},{text:"Fix both simultaneously even if it takes longer.",score:5,cls:"good",label:"Reasonable",why:"Balanced approach that treats both as priorities."},{text:"Launch the feature and patch the bug next update.",score:-3,cls:"poor",label:"Questionable",why:"Knowingly shipping something that disadvantages specific users is problematic."},{text:"Launch and quietly deprioritise the bug indefinitely.",score:-7,cls:"worst",label:"Harmful",why:"Ignoring a known inequity for profit is discriminatory."}]},
+  {entity:"Debate Team",icon:"🎓",flavor:"teaches you to argue any side — dangerous skill",situation:"You could win the championship by exploiting a technical rule loophole. It is legal but against the spirit of fair debate.",options:[{text:"Compete on merit — a loophole victory is hollow.",score:10,cls:"best",label:"Principled",why:"What you win by gaming the rules you did not truly earn."},{text:"Use it but flag it to organisers after so they can close it.",score:5,cls:"good",label:"Reasonable",why:"Uses what is available while contributing to a fairer system."},{text:"Use it — if it is in the rules it is fair game.",score:-3,cls:"poor",label:"Questionable",why:"Legal and ethical are not the same thing."},{text:"Use it and celebrate how clever you were.",score:-7,cls:"worst",label:"Harmful",why:"Celebrating rule exploitation encourages a culture of gaming systems."}]},
+  {entity:"Student Council",icon:"🏛️",flavor:"a little power that reveals a lot about character",situation:"You can secure funding by misrepresenting student needs in a grant application.",options:[{text:"Submit an honest application — the real needs are compelling enough.",score:10,cls:"best",label:"Principled",why:"Misrepresentation in grant applications is fraud, regardless of intent."},{text:"Find a creative but honest way to frame the needs more compellingly.",score:5,cls:"good",label:"Reasonable",why:"Good writing is not the same as lying."},{text:"Exaggerate slightly — everyone does on grant applications.",score:-3,cls:"poor",label:"Questionable",why:"Normalising small dishonesty still corrodes integrity."},{text:"Fabricate the data — the school really needs the money.",score:-7,cls:"worst",label:"Harmful",why:"This is fraud. Good intentions do not change that."}]},
+  {entity:"Neighbourhood Watch",icon:"👀",flavor:"means well, keeps detailed notes on everyone",situation:"You witness a neighbour being verbally harassed by a group of teens. You are outnumbered.",options:[{text:"Call for help while staying visible so the neighbour is not alone.",score:10,cls:"best",label:"Principled",why:"Effective bystander action does not require heroism — just presence."},{text:"Intervene directly and verbally.",score:5,cls:"good",label:"Reasonable",why:"Brave — but assess the risk first, escalation is possible."},{text:"Walk away and call police once you are safe.",score:-3,cls:"poor",label:"Questionable",why:"Prioritises your safety over the person being harassed."},{text:"Keep walking and do nothing.",score:-7,cls:"worst",label:"Harmful",why:"Choosing not to act is still a choice."}]},
+  {entity:"Ivy League Forum",icon:"🏫",flavor:"anonymous students competing for prestige at any cost",situation:"A wealthy student pays you to write their college application. The money would cover three months of family expenses.",options:[{text:"Decline — financial pressure does not justify helping someone cheat.",score:10,cls:"best",label:"Principled",why:"This harms the integrity of a system others play fairly."},{text:"Offer to coach them intensively instead — legitimately.",score:5,cls:"good",label:"Reasonable",why:"An honest way to earn money while still helping them."},{text:"Do it but feel guilty about it.",score:-3,cls:"poor",label:"Questionable",why:"Guilt without changed behaviour is just discomfort, not ethics."},{text:"Do it — rich students have every other advantage anyway.",score:-7,cls:"worst",label:"Harmful",why:"Injustice in the system does not make it right to profit from it."}]},
+  {entity:"School Climate Group",icon:"🌱",flavor:"passionate, organised, starting to scare the administration",situation:"Your group's pollution data was collected incorrectly and significantly overstates the problem.",options:[{text:"Correct and republish the data even if it weakens your campaign.",score:10,cls:"best",label:"Principled",why:"A campaign built on bad data will collapse and damage your cause."},{text:"Disclose the error to your closest allies but not publicly.",score:5,cls:"good",label:"Reasonable",why:"More honest than nothing, but still not fully transparent."},{text:"Fix the methodology going forward without addressing past claims.",score:-3,cls:"poor",label:"Questionable",why:"Fixing the future while hiding the past is still dishonesty."},{text:"Keep using it — the underlying problem is real even if numbers are off.",score:-7,cls:"worst",label:"Harmful",why:"Knowingly using false data for a good cause destroys credibility when discovered."}]},
+  {entity:"Team Vortex",icon:"🎮",flavor:"sponsorships, contracts, and a conduct policy",situation:"You are offered a spot on a better team mid-season. Leaving would effectively end your current team's run.",options:[{text:"Honour your commitment and finish the season first.",score:10,cls:"best",label:"Principled",why:"Commitments to teammates carry moral weight beyond any contract."},{text:"Be honest with both teams and let them negotiate.",score:5,cls:"good",label:"Reasonable",why:"Transparency gives everyone a chance at a fair outcome."},{text:"Take the offer — your career has to come first.",score:-3,cls:"poor",label:"Questionable",why:"Self-interest is understandable but abandoning teammates mid-season breaks trust."},{text:"Take the offer and tell your team last minute.",score:-7,cls:"worst",label:"Harmful",why:"Springing a departure on teammates when it is too late is a betrayal."}]},
+  {entity:"Honor Code Officer",icon:"⚖️",flavor:"a peer-elected role nobody wanted until it had consequences",situation:"You catch a student about to graduate cheating on a final. Reporting prevents their graduation.",options:[{text:"Report it — the code applies to everyone regardless of timing.",score:10,cls:"best",label:"Principled",why:"Consistency is the only thing that makes an honour code meaningful."},{text:"Report but formally advocate for a lesser sanction given the timing.",score:5,cls:"good",label:"Reasonable",why:"Upholds the code while arguing for proportionate consequences."},{text:"Warn them privately and let them resubmit.",score:-3,cls:"poor",label:"Questionable",why:"A private warning without consequences is not enforcement."},{text:"Look the other way — ruining a graduation is too harsh.",score:-7,cls:"worst",label:"Harmful",why:"Mercy for one you would deny to others is not mercy — it is favouritism."}]},
+  {entity:"Prestige SAT Prep",icon:"🏫",flavor:"sells the dream of elite college at an uncomfortable price",situation:"A prep company guarantees a 200-point score increase. You suspect their methods are borderline fraudulent.",options:[{text:"Investigate before paying — ask for details on their methods.",score:10,cls:"best",label:"Principled",why:"Due diligence before committing money and trust is basic ethical practice."},{text:"Try it and report them if the methods turn out to be wrong.",score:5,cls:"good",label:"Reasonable",why:"Gives them a chance but puts you at risk of benefiting from cheating."},{text:"Use them and keep your suspicions to yourself.",score:-3,cls:"poor",label:"Questionable",why:"Benefiting from likely misconduct while staying silent makes you complicit."},{text:"Sign up — results matter more than methods.",score:-7,cls:"worst",label:"Harmful",why:"Wilful ignorance about potential cheating is not innocence."}]},
+  {entity:"Equity Alliance",icon:"✊",flavor:"fights for fairness and occasionally among themselves",situation:"Your club receives a large grant with conditions that restrict what topics you can address.",options:[{text:"Decline — your independence is worth more than the funding.",score:10,cls:"best",label:"Principled",why:"An advocacy group that accepts conditions on its advocacy has surrendered its purpose."},{text:"Accept only if the conditions can be fully negotiated away.",score:5,cls:"good",label:"Reasonable",why:"Tests whether the funder is flexible before walking away."},{text:"Accept and comply fully — the money enables other good work.",score:-3,cls:"poor",label:"Questionable",why:"A silenced advocacy group is no longer an advocacy group."},{text:"Accept and quietly work around the conditions.",score:-7,cls:"worst",label:"Harmful",why:"Accepting a contract you plan to violate is dishonest."}]},
+  {entity:"Unsigned Band",icon:"🎵",flavor:"three years of grinding and one offer that feels like a trap",situation:"Your bandmate wrote most of your best songs but wants equal credit split. You are the face who drives the success.",options:[{text:"Credit should reflect contribution — negotiate an honest split.",score:10,cls:"best",label:"Principled",why:"Fame and creative contribution are different things. Both deserve recognition."},{text:"Agree to equal split — band unity matters more than perfect accuracy.",score:5,cls:"good",label:"Reasonable",why:"Pragmatic and keeps the band together even if not precisely fair."},{text:"Take majority credit — your promotion made it successful.",score:-3,cls:"poor",label:"Questionable",why:"Promotion is valuable but does not justify claiming credit for songs you did not write."},{text:"Cut them out and claim sole credit.",score:-7,cls:"worst",label:"Harmful",why:"Taking credit for others' creative work is theft."}]},
+  {entity:"Street Art Collective",icon:"🎨",flavor:"creates beauty illegally and debates whether that matters",situation:"A piece your collective painted is being sold as an NFT by someone who photographed it without permission.",options:[{text:"Claim ownership publicly and request the NFT be taken down.",score:10,cls:"best",label:"Principled",why:"Artists have a right to control how their work is commercialised."},{text:"Consult a lawyer about your options before acting.",score:5,cls:"good",label:"Reasonable",why:"Explores your actual rights before making claims."},{text:"Let it go — street art is public by nature.",score:-3,cls:"poor",label:"Questionable",why:"Public display does not grant permission for commercial exploitation."},{text:"Immediately sell your own NFT of the same piece to compete.",score:-7,cls:"worst",label:"Harmful",why:"Escalating into a commercial race rather than addressing the theft."}]},
+  {entity:"Study Group App",icon:"📱",flavor:"designed for collaboration, mostly used to share answers",situation:"A bug in the app you built gives you access to other users' private notes. You have not looked yet.",options:[{text:"Report the bug immediately and do not look at anything.",score:10,cls:"best",label:"Principled",why:"The ethical obligation is clear the moment you discover the access."},{text:"Fix it, document it, and notify affected users.",score:5,cls:"good",label:"Reasonable",why:"Responsible disclosure that respects user trust."},{text:"Fix it quietly and tell no one.",score:-3,cls:"poor",label:"Questionable",why:"Users deserved to know they were exposed, even after an honest fix."},{text:"Look at a few notes just to understand the scope.",score:-7,cls:"worst",label:"Harmful",why:"Curiosity does not justify accessing private information you are not authorised to see."}]},
+  {entity:"The Hustle Podcast",icon:"🎙️",flavor:"two dropouts who turned hustle culture into a media empire",situation:"You are asked to interview a controversial entrepreneur whose practices you consider harmful. Biggest audience ever.",options:[{text:"Do it but prepare hard questions and challenge them directly.",score:10,cls:"best",label:"Principled",why:"A platform is most valuable when used for genuine accountability."},{text:"Decline — giving them a platform amplifies harm.",score:5,cls:"good",label:"Reasonable",why:"Platform refusal is a legitimate editorial choice."},{text:"Do it and avoid the controversial topics to keep the relationship.",score:-3,cls:"poor",label:"Questionable",why:"Interviewing someone while avoiding what makes them controversial is bad journalism."},{text:"Do it softly — do not challenge them at all.",score:-7,cls:"worst",label:"Harmful",why:"A friendly interview with a harmful actor is essentially free advertising."}]},
+  {entity:"City Youth Council",icon:"🏛️",flavor:"real power, real politics, real disappointments",situation:"You have evidence a council member is misusing funds, but exposing them will collapse a programme helping hundreds of students.",options:[{text:"Report the misconduct and advocate for the programme to continue under clean leadership.",score:10,cls:"best",label:"Principled",why:"Corruption and the programmes it funds can both be addressed — but not if you stay silent."},{text:"Confront them privately and demand they fix it or you will report it.",score:5,cls:"good",label:"Reasonable",why:"Gives them a chance to correct it while keeping pressure on."},{text:"Stay silent to protect the programme.",score:-3,cls:"poor",label:"Questionable",why:"Programmes built on fraud are fragile — protecting corruption protects nothing long-term."},{text:"Use the evidence to personally leverage better outcomes from them.",score:-7,cls:"worst",label:"Harmful",why:"Using evidence of wrongdoing as personal leverage is blackmail."}]}
 ];
 
-// Icon picker
-function icon4hint(h){
-  h=(h||'').toLowerCase();
-  if(/admiral|general|colonel|military|navy|army|commander|defense|weapon/.test(h))return'⚔️';
-  if(/president|prime|ruler|dictator|king|queen|minister|politi|state|governor|parliament/.test(h))return'🏛️';
-  if(/astronaut|space|orbital|mars|moon|rocket|satellite|station/.test(h))return'🚀';
-  if(/scientist|inventor|research|lab|physicist|chemist|engineer|biotech/.test(h))return'🔬';
-  if(/doctor|surgeon|hospital|medical|pharma|health|bioethic/.test(h))return'🩺';
-  if(/judge|prosecutor|attorney|court|legal|law/.test(h))return'⚖️';
-  if(/journalist|whistleblow|activist|press|media|reporter|newspaper/.test(h))return'📰';
-  if(/spy|intelligence|agent|secret|bureau|surveillance/.test(h))return'🕵️';
-  if(/criminal|mob|cartel|hacker|gang|syndicate|mafia|trafficking/.test(h))return'💀';
-  if(/athlete|coach|sport|team|champion|olympic|soccer|swim|baseball/.test(h))return'🏆';
-  if(/artist|musician|filmmaker|creative|studio|gallery|band|art/.test(h))return'🎨';
-  if(/religious|cult|church|temple|faith|spiritual|prophet|theology/.test(h))return'✝️';
-  if(/energy|oil|gas|renewable|power|electric|climate|environment/.test(h))return'⚡';
-  if(/finance|bank|invest|fund|capital|equity|hedge|dark money/.test(h))return'💰';
-  if(/tech|ai|data|software|cyber|digital|compute|monopoly/.test(h))return'💻';
-  if(/family|dynasty|clan|trust|heritage|estate|inherited/.test(h))return'👨‍👩‍👧';
-  if(/ngo|foundation|charity|nonprofit|environment|green|climate/.test(h))return'🌱';
-  if(/food|agri|farm|restaurant|cuisine|burger|cafe/.test(h))return'🌾';
-  if(/social media|influencer|youtube|channel|content|streamer/.test(h))return'📱';
-  if(/real estate|property|developer|housing/.test(h))return'🏗️';
-  if(/luxury|fashion|brand|couture|jewel/.test(h))return'💎';
-  if(/disaster|crisis|war|conflict|zone|collapse|pandemic/.test(h))return'🔥';
-  if(/university|college|school|academic|teacher|principal|librarian/.test(h))return'🎓';
-  if(/logistics|supply|transport|ship|cargo/.test(h))return'🚢';
-  if(/pet|dog|cat|hamster|animal|bird/.test(h))return'🐾';
-  if(/playground|park|ice cream|candy|toy/.test(h))return'🎡';
-  if(/game|video game|esport|clan|gamer|minecraft/.test(h))return'🎮';
-  if(/music|band|concert|song|singer|unsigned/.test(h))return'🎵';
-  if(/friend|classmate|kid|child|student|teenager/.test(h))return'👤';
-  if(/grandma|grandpa|parent|mom|dad|brother|sister|family member/.test(h))return'👨‍👩‍👧';
-  return'🏢';
-}
-
 // ══ STATE ══
-let selectedLv='explorer';
-let ENTITIES=[];   // [{name,flavor,icon}]
 let g={};
+let selectedPlayers=0;
+let selectedTime=0;
+let timerInterval=null;
+let pool=[];
 
-function pickLevel(el){
-  document.querySelectorAll('.lv').forEach(b=>b.classList.remove('on'));
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+// ══ SETUP ══
+function pickPlayers(el){
+  document.querySelectorAll('#player-count-row .popt').forEach(p=>p.classList.remove('on'));
   el.classList.add('on');
-  selectedLv=el.dataset.lv;
+  selectedPlayers=parseInt(el.dataset.v);
+  document.getElementById('n2').style.display=selectedPlayers>=2?'block':'none';
+  document.getElementById('n3').style.display=selectedPlayers>=3?'block':'none';
+}
+function pickTime(el){
+  document.querySelectorAll('#time-row .popt').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');
+  selectedTime=parseInt(el.dataset.v);
 }
 
-// ══ SETUP → OPENING ══
-function goSetup(){
+function startGame(){
+  if(!selectedPlayers){alert('Please select number of players.');return;}
+  if(!selectedTime){alert('Please select a time limit.');return;}
+  const names=[];
+  names.push(document.getElementById('n1').value.trim()||'Player 1');
+  if(selectedPlayers>=2) names.push(document.getElementById('n2').value.trim()||'Player 2');
+  if(selectedPlayers>=3) names.push(document.getElementById('n3').value.trim()||'Player 3');
+
+  const timeEach=selectedTime*60; // seconds
   g={
-    humanName: document.getElementById('human-name').value.trim()||'Player',
-    level: selectedLv,
-    hScore:0, aiScore:0,
-    hScoreHist:[], aiScoreHist:[],
-    round:1, turn:'human',
-    maxTurns:0, turnsUsed:0,
+    players: names.map(n=>({name:n,score:0,timeLeft:timeEach,timeTotal:timeEach,done:false,history:[]})),
+    current:0,
     history:[],
-    doubleStakes:false,
+    pool: shuffle([...SCENARIOS])
   };
-  showScreen('s-opening');
-}
 
-// ══ OPENING ROLL ══
-function doOpeningRoll(){
-  document.getElementById('open-btn').disabled=true;
-  const d1=document.getElementById('open-d1'),d2=document.getElementById('open-d2');
-  d1.classList.add('rolling');d2.classList.add('rolling');
-  setTimeout(()=>{
-    const v1=rand6(),v2=rand6();
-    d1.textContent=v1;d2.textContent=v2;
-    d1.classList.remove('rolling');d2.classList.remove('rolling');
-    const tot=v1+v2;
-    g.maxTurns=tot*10;
-    g.turn='human';
-    const lv=LEVELS[g.level];
-    document.getElementById('open-result').textContent=
-      `${v1}+${v2}=${tot} → ${g.maxTurns} total turns · ${g.humanName} goes first`;
-    setTimeout(buildEntities,1000);
-  },480);
-}
-
-// ══ BUILD ENTITIES ══
-function setProgress(p){document.getElementById('progress-fill').style.width=p+'%';}
-function setStatus(t){document.getElementById('build-status').textContent=t;}
-function addLog(txt,done=false){
-  const log=document.getElementById('build-log');
-  const d=document.createElement('div');
-  d.className='build-item'+(done?' done':'');
-  d.innerHTML=`<span class="ck">${done?'✓':'◦'}</span><span>${txt}</span>`;
-  log.appendChild(d);
-  log.scrollTop=log.scrollHeight;
-}
-
-async function buildEntities(){
-  showScreen('s-build');
-  document.getElementById('build-log').innerHTML='';
-  setProgress(0);setStatus('Contacting the Ethics Board…');
-  const lv=LEVELS[g.level];
-  try{
-    setProgress(20);setStatus('AI is populating your world…');
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',max_tokens:lv.tokEnt,
-        messages:[{role:'user',content:
-`${lv.entityPrompt}
-
-IMPORTANT: Each entity needs a "flavor" field — a vivid 8-12 word description that makes them come alive. Not just a label. Something that hints at their personality, reputation, or moral complexity. Example: instead of "tech company", write "built an empire on your data, smiling all the way".
-
-JSON only, no preamble: {"entities":[{"name":"...","flavor":"..."},...]} — exactly 24 items.`
-        }]
-      })
-    });
-    setProgress(60);setStatus('Processing…');
-    const data=await res.json();
-    const txt=data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(txt);
-    ENTITIES=[];
-    parsed.entities.slice(0,24).forEach(e=>{
-      const name=e.name.length>22?e.name.slice(0,21)+'…':e.name;
-      const ent={name,flavor:e.flavor||'',icon:icon4hint(e.flavor+' '+e.name)};
-      ENTITIES.push(ent);
-      addLog(`${ent.icon} ${name}`,true);
-    });
-    while(ENTITIES.length<24)ENTITIES.push({name:`Entity ${ENTITIES.length+1}`,flavor:'a mysterious presence',icon:'🏢'});
-    setProgress(100);setStatus('Ready.');
-    setTimeout(launchGame,600);
-  }catch(err){
-    setStatus('Using built-in world…');
-    ENTITIES=getFallback(g.level);
-    ENTITIES.forEach(e=>addLog(`${e.icon} ${e.name}`,true));
-    setProgress(100);
-    setTimeout(launchGame,600);
-  }
-}
-
-function getFallback(level){
-  const sets={
-    explorer:[
-      {name:'Ms. Opal',flavor:'the kindest librarian who remembers every kid\'s name',icon:'🎓'},
-      {name:'Tyler from 3B',flavor:'your best friend who sometimes takes things too far',icon:'👤'},
-      {name:'Coach Petey',flavor:'believes every kid deserves a chance to play',icon:'🏆'},
-      {name:'Biscuit the Dog',flavor:'the school therapy dog everyone loves',icon:'🐾'},
-      {name:'Grandma Rosa',flavor:'always knows when you are not telling the whole truth',icon:'👨‍👩‍👧'},
-      {name:'The Lunch Table',flavor:'where the popular kids sit and decide who\'s in',icon:'🎡'},
-      {name:'Mia the New Kid',flavor:'just moved here and doesn\'t know anyone yet',icon:'👤'},
-      {name:'Zarlo of PlanetJump',flavor:'your favourite video game hero with a big moral code',icon:'🎮'},
-      {name:'The Craft Club',flavor:'a small group who share supplies and big ideas',icon:'🎨'},
-      {name:'Sunny Scoops',flavor:'the ice cream place that gives free scoops on birthdays',icon:'🎡'},
-      {name:'Baby Sister Cleo',flavor:'looks up to you for absolutely everything',icon:'👨‍👩‍👧'},
-      {name:'Percy the Hamster',flavor:'the class pet whose cage needs cleaning more often',icon:'🐾'},
-      {name:'Mr. Fenn',flavor:'PE teacher who never lets anyone sit out unfairly',icon:'🎓'},
-      {name:'Big Brother Jake',flavor:'says he knows best but doesn\'t always',icon:'👨‍👩‍👧'},
-      {name:'The Fireflies',flavor:'your little-league team who really want to win this year',icon:'🏆'},
-      {name:'The Wobblebot Gang',flavor:'cartoon robots who always argue about right and wrong',icon:'🎮'},
-      {name:'Old Mr. Briggs',flavor:'the neighbour who gives out the best Halloween candy',icon:'👤'},
-      {name:'Benny\'s Toy Reviews',flavor:'the YouTube channel you watch every single morning',icon:'📱'},
-      {name:'The Big Slide',flavor:'the best spot in the park, always a fight to get on',icon:'🎡'},
-      {name:'Talent Show Panel',flavor:'three teachers who decide who gets to perform',icon:'🎓'},
-      {name:'Crafty Twins Show',flavor:'online sisters who always say sharing is caring',icon:'📱'},
-      {name:'Pebble Park Crew',flavor:'neighbourhood kids who made their own rules',icon:'🎡'},
-      {name:'Captain Snugglepaws',flavor:'the stuffed animal who witnesses everything at night',icon:'🐾'},
-      {name:'Science Fair Cmte',flavor:'decides who wins the trophy everyone desperately wants',icon:'🎓'},
-    ],
-    challenger:[
-      {name:'Coach Ramos',flavor:'pushes you harder than anyone but always has your back',icon:'🏆'},
-      {name:'@sparkle_maya',flavor:'has 40k followers and a talent for leaving people out',icon:'📱'},
-      {name:'Clan Nexus',flavor:'the gaming squad that takes ranked matches very seriously',icon:'🎮'},
-      {name:'The Popular Table',flavor:'sits in the exact centre of the cafeteria for a reason',icon:'👤'},
-      {name:'Mrs. Chen',flavor:'your babysitting client who pays well and trusts you completely',icon:'👤'},
-      {name:'Vice Principal Strick',flavor:'has a long memory and a very short patience',icon:'🎓'},
-      {name:'The Group Chat',flavor:'where everything gets said that should never be written down',icon:'📱'},
-      {name:'East Side Swim Club',flavor:'rigorous, cliquey, and obsessed with lap times',icon:'🏆'},
-      {name:'Dad\'s Girlfriend',flavor:'trying hard to fit in, but not making it easy',icon:'👨‍👩‍👧'},
-      {name:'The Fan Art Discord',flavor:'a creative community with a surprisingly strict hierarchy',icon:'🎮'},
-      {name:'GameStop on Maple',flavor:'the local store where loyalties and trade-ins get complicated',icon:'🎮'},
-      {name:'Student Council',flavor:'a small amount of power that reveals a lot about character',icon:'🎓'},
-      {name:'Gamer Bros Channel',flavor:'two brothers who will say anything for views and subscribers',icon:'📱'},
-      {name:'Cousin Tyler',flavor:'always right about everything, according to Cousin Tyler',icon:'👨‍👩‍👧'},
-      {name:'River Hawks FC',flavor:'the school soccer team with a championship trophy and a secret',icon:'🏆'},
-      {name:'Lawn Mowing Crew',flavor:'four friends and one lawnmower chasing summer money',icon:'👤'},
-      {name:'Bubble Tea Place',flavor:'the after-school spot where reputations get discussed',icon:'🎡'},
-      {name:'The Minecraft Realm',flavor:'a shared world with unwritten rules and real friendships',icon:'🎮'},
-      {name:'BlastForce Squad',flavor:'elite gaming clan that doesn\'t accept losing gracefully',icon:'🎮'},
-      {name:'Sat. Soccer League',flavor:'where parents get more competitive than the kids',icon:'🏆'},
-      {name:'The Art Summer Camp',flavor:'ten days away from home and full of unexpected choices',icon:'🎨'},
-      {name:'Grade 7 Talent Show',flavor:'one stage, many egos, and very limited time slots',icon:'🎓'},
-      {name:'Bubble Tea Owner',flavor:'runs the place alone and notices when money goes missing',icon:'👤'},
-      {name:'The Honor Roll',flavor:'a list that means everything to some and nothing to others',icon:'🎓'},
-    ],
-    strategist:[
-      {name:'@truthbomb.tae',flavor:'calls out injustice online, sometimes accurately',icon:'📱'},
-      {name:'Team Vortex',flavor:'esports org with sponsorships, contracts, and a conduct policy',icon:'🎮'},
-      {name:'Café Lumière',flavor:'your first real job, a charming place with complicated politics',icon:'🌾'},
-      {name:'School Climate Grp',flavor:'passionate, organised, and starting to scare the administration',icon:'🌱'},
-      {name:'Prestige SAT Prep',flavor:'sells the dream of elite college at an uncomfortable price',icon:'🎓'},
-      {name:'The Equity Alliance',flavor:'fights for fairness and occasionally fights among themselves',icon:'🌱'},
-      {name:'Debate Team',flavor:'teaches you to argue any side, which can be a dangerous skill',icon:'🎓'},
-      {name:'The Hustle Podcast',flavor:'two dropouts who turned hustle culture into a media empire',icon:'📱'},
-      {name:'Burger Barn Mgr',flavor:'has rules, has favourites, and holds the schedule over you',icon:'🌾'},
-      {name:'City Youth Council',flavor:'real power, real politics, real disappointments',icon:'🏛️'},
-      {name:'Family Restaurant',flavor:'Dad built it from nothing; now it might be built on something shaky',icon:'🌾'},
-      {name:'Academic Board',flavor:'quiet enforcers of integrity in an era of easy cheating',icon:'🎓'},
-      {name:'The Ranked Grind',flavor:'a community that worships improvement and despises shortcuts',icon:'🎮'},
-      {name:'School Newspaper',flavor:'student journalism with real editorial dilemmas',icon:'📰'},
-      {name:'The Viral App',flavor:'a startup two students built in a bedroom; now it\'s everywhere',icon:'💻'},
-      {name:'Ivy League Forum',flavor:'anonymous students competing for prestige at any cost',icon:'🎓'},
-      {name:'Street Art Collective',flavor:'creates beauty illegally and debates whether that matters',icon:'🎨'},
-      {name:'Divorced Parent\'s Atty',flavor:'professional, effective, and completely indifferent to your feelings',icon:'⚖️'},
-      {name:'Dad\'s Hardware Shop',flavor:'third generation, in debt, and hoping you will take it over',icon:'🌾'},
-      {name:'Unsigned Band',flavor:'three years of grinding and one offer that feels like a trap',icon:'🎵'},
-      {name:'Nbhd Watch Captain',flavor:'means well, keeps detailed notes on everyone',icon:'👤'},
-      {name:'Tutoring Agency',flavor:'matches desperate students with tutors who know the tests too well',icon:'🎓'},
-      {name:'Study Group App',flavor:'designed for collaboration; mostly used to share answers',icon:'💻'},
-      {name:'Honor Code Officer',flavor:'a peer-elected role nobody wanted until it had consequences',icon:'⚖️'},
-    ],
-    master:[
-      {name:'Admiral Kress Vondal',flavor:'decorated, ruthless, and sitting on classified evidence',icon:'⚔️'},
-      {name:'Dr. Mira Felbton',flavor:'pioneered the gene edit that saved thousands and alarmed millions',icon:'🔬'},
-      {name:'NovaSphere Ltd',flavor:'owns your browsing history, your health data, and three senators',icon:'💻'},
-      {name:'The Plankton Family',flavor:'third-generation wealth built on a first-generation atrocity',icon:'👨‍👩‍👧'},
-      {name:'Col. Drix Havershaw',flavor:'the officer who gave the order no one will confirm or deny',icon:'⚔️'},
-      {name:'Orbital Station 7',flavor:'where seven nations share two toilets and one disputed experiment',icon:'🚀'},
-      {name:'Prosecutor Aldene',flavor:'has a perfect conviction rate and a flexible definition of evidence',icon:'⚖️'},
-      {name:'The Cramshaw Trust',flavor:'old money, long memories, and a philanthropy arm nobody audits',icon:'💰'},
-      {name:'Snafu Syndicate',flavor:'the dark-money channel that funds both sides of the same war',icon:'💀'},
-      {name:'Redd Cartel',flavor:'controls supply chains across four continents and two parliaments',icon:'💀'},
-      {name:'Grexon Defense',flavor:'builds the weapons that enforce the peace that requires the weapons',icon:'⚔️'},
-      {name:'Wumple Energy',flavor:'pivoted to renewables once the PR damage outweighed the oil profit',icon:'⚡'},
-      {name:'Florix Biotech',flavor:'holds the patent on the only treatment for a disease it may have caused',icon:'🩺'},
-      {name:'Orbix Media',flavor:'algorithmically optimised for outrage; surprisingly good at it',icon:'📰'},
-      {name:'Zorkin Logistics',flavor:'moves goods across borders and questions across none',icon:'🚢'},
-      {name:'Mulchwhistle NGO',flavor:'saves rainforests publicly; the board meetings are less inspiring',icon:'🌱'},
-      {name:'The Fenwick-9 Crew',flavor:'eight months from Earth and six months from agreeing on anything',icon:'🚀'},
-      {name:'Judge Harlan Brix',flavor:'appointed for life, which has proved to be a very long time',icon:'⚖️'},
-      {name:'Trixley Financial',flavor:'invented the instrument that caused the crash it profited from',icon:'💰'},
-      {name:'Dir. Yelena Sorak',flavor:'intelligence chief who collects secrets the way others collect art',icon:'🕵️'},
-      {name:'Bongocoin Capital',flavor:'crypto firm that mostly mines volatility and regulatory gaps',icon:'💰'},
-      {name:'The Dooble Trust',flavor:'inherited wealth nobody can explain and nobody is allowed to question',icon:'👨‍👩‍👧'},
-      {name:'Whizzle Luxury',flavor:'sells aspiration to the rich and exclusion to everyone else',icon:'💎'},
-      {name:'Quibble Networks',flavor:'provides connectivity to 800 million users and privacy to none',icon:'💻'},
-    ]
-  };
-  return sets[level]||sets.master;
-}
-
-// ══ LAUNCH ══
-function launchGame(){
-  const lv=LEVELS[g.level];
-  document.getElementById('hud-hname').textContent=g.humanName.toUpperCase().slice(0,8);
-  document.getElementById('hud-level').textContent=lv.icon;
-  document.getElementById('logo-sub').textContent=`${lv.icon} ${lv.name.toUpperCase()} · Ages ${lv.age}`;
-  updateHUD();
+  pool=shuffle([...SCENARIOS]);
+  buildHUD();
   showScreen('s-game');
-  setTurn(g.turn);
+  showPassScreen();
+}
+
+// ══ HUD ══
+function buildHUD(){
+  const wrap=document.getElementById('hud-players');
+  wrap.innerHTML=g.players.map((p,i)=>`
+    <div class="hud-p" id="hudp${i}">
+      <div class="hud-pname">${p.name.toUpperCase().slice(0,9)}</div>
+      <div class="hud-pscore" id="huds${i}">${p.score>0?'+':''}${p.score}</div>
+      <div class="hud-ptime" id="hudt${i}">${fmtTime(p.timeLeft)}</div>
+      <div class="timer-bar-wrap"><div class="timer-bar" id="hudbar${i}" style="width:100%"></div></div>
+    </div>
+  `).join('');
 }
 
 function updateHUD(){
-  const hs=document.getElementById('hud-hscore');
-  hs.textContent=(g.hScore>=0?'+':'')+g.hScore;
-  hs.className='hud-score'+(g.hScore>0?' pos':g.hScore<0?' neg':'');
-  const as=document.getElementById('hud-ascore');
-  as.textContent=(g.aiScore>=0?'+':'')+g.aiScore;
-  as.className='hud-score'+(g.aiScore>0?' pos':g.aiScore<0?' neg':'');
-  document.getElementById('hud-round').textContent=`R·${g.round}`;
-  const left=Math.max(0,g.maxTurns-g.turnsUsed);
-  document.getElementById('hud-turns').textContent=`${left} TURNS LEFT`;
+  g.players.forEach((p,i)=>{
+    const sc=document.getElementById(`huds${i}`);
+    sc.textContent=(p.score>0?'+':'')+p.score;
+    sc.className='hud-pscore'+(p.score>0?' pos':p.score<0?' neg':'');
+    const tc=document.getElementById(`hudt${i}`);
+    tc.textContent=p.done?'DONE':fmtTime(p.timeLeft);
+    tc.className='hud-ptime'+(p.done?' done-t':p.timeLeft<=30?' urgent':'');
+    const bar=document.getElementById(`hudbar${i}`);
+    const pct=Math.max(0,p.timeLeft/p.timeTotal*100);
+    bar.style.width=pct+'%';
+    bar.className='timer-bar'+(p.timeLeft<=30?' urgent':'');
+    const card=document.getElementById(`hudp${i}`);
+    card.className='hud-p'+(i===g.current&&!p.done?' active':p.done?' done':'');
+  });
 }
 
-function setTurn(who){
-  g.turn=who;
-  const strip=document.getElementById('turn-strip');
-  const lv=LEVELS[g.level];
-  if(who==='human'){
-    strip.className='turn-strip human';
-    document.getElementById('turn-text').textContent=`${g.humanName}'s turn`;
-  }else{
-    strip.className='turn-strip ai';
-    document.getElementById('turn-text').textContent=`AI's turn`;
-  }
-  showDice();
+function fmtTime(s){
+  const m=Math.floor(s/60),sec=s%60;
+  return `${m}:${sec.toString().padStart(2,'0')}`;
 }
 
-// ══ PANELS ══
-function panels(){return document.getElementById('game-panels');}
-function clearPanels(){panels().innerHTML='';}
-function addPanel(html){
-  const d=document.createElement('div');
-  d.innerHTML=html;
-  panels().appendChild(d);
-  window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});
-}
-function addCard(html){
-  addPanel(`<div class="card" style="animation:fadeUp 0.3s ease;">${html}</div>`);
-}
+// ══ PASS SCREEN ══
+function showPassScreen(){
+  // Find next active player
+  const p=g.players[g.current];
+  if(p.done){advancePlayer();return;}
 
-// ══ DICE ══
-function showDice(){
-  clearPanels();
-  const who=g.turn==='human'?g.humanName:'AI';
-  addCard(`
-    <div class="dice-card">
-      <p class="dice-title">${g.turn==='human'?`${g.humanName}, roll the dice`:'Roll for AI'}</p>
-      <div class="dice-row">
-        <div class="die" id="die1">?</div>
-        <div class="die" id="die2">?</div>
-      </div>
-      <div class="dice-result" id="dice-result">—</div>
-      <div class="btn-row" style="margin-top:14px;">
-        <button class="btn" id="roll-btn" onclick="rollDice()">ROLL</button>
-      </div>
-    </div>
-  `);
+  stopTimer();
+  document.getElementById('pass-name').textContent=p.name.toUpperCase();
+  document.getElementById('pass-time').textContent=fmtTime(p.timeLeft)+' remaining';
+  showScreen('s-pass');
 }
 
-function rand6(){return Math.ceil(Math.random()*6);}
+function startMyTurn(){
+  showScreen('s-game');
+  updateHUD();
+  startTimer();
+  showScenario();
+}
 
-function rollDice(){
-  document.getElementById('roll-btn').disabled=true;
-  const d1=document.getElementById('die1'),d2=document.getElementById('die2');
-  d1.classList.add('rolling');d2.classList.add('rolling');
-  setTimeout(()=>{
-    const v1=rand6(),v2=rand6(),tot=v1+v2;
-    d1.textContent=v1;d2.textContent=v2;
-    d1.classList.remove('rolling');d2.classList.remove('rolling');
-    g.rollType=tot%2===0?'benefit':'problem';
-    g.turnsUsed++;
+// ══ TIMER ══
+function startTimer(){
+  stopTimer();
+  timerInterval=setInterval(()=>{
+    const p=g.players[g.current];
+    if(p.timeLeft<=0){
+      p.timeLeft=0;
+      p.done=true;
+      updateHUD();
+      stopTimer();
+      showTimeUp();
+      return;
+    }
+    p.timeLeft--;
     updateHUD();
-
-    // Double six
-    if(v1===6&&v2===6){
-      document.getElementById('dice-result').innerHTML=`<span style="color:var(--ember)">🎲 DOUBLE SIX — GAME ENDS!</span>`;
-      setTimeout(()=>endGame('double six rolled'),1400);return;
-    }
-
-    // Check turn limit
-    if(g.turnsUsed>=g.maxTurns){
-      document.getElementById('dice-result').textContent=`${v1}+${v2}=${tot}`;
-      setTimeout(()=>endGame('turn limit reached'),1000);return;
-    }
-
-    // Chance card? ~1 in 7
-    if(Math.random()<(1/7)){
-      document.getElementById('dice-result').textContent=`${v1}+${v2}=${tot} · Chance!`;
-      setTimeout(showChanceCard,700);return;
-    }
-
-    // Pick entity
-    const ent=ENTITIES[Math.floor(Math.random()*ENTITIES.length)];
-    g.currentEntity=ent;
-    document.getElementById('dice-result').textContent=
-      `${v1}+${v2}=${tot} · ${g.rollType==='benefit'?'BENEFIT':'PROBLEM'}`;
-    setTimeout(()=>showEntityReveal(ent),700);
-  },480);
-}
-
-// ══ ENTITY REVEAL ══
-function showEntityReveal(ent){
-  clearPanels();
-  addCard(`
-    <div class="entity-card">
-      <span class="entity-icon">${ent.icon}</span>
-      <div class="entity-name">${ent.name}</div>
-      <div class="entity-flavor">${ent.flavor}</div>
-      <div class="type-badge ${g.rollType}">
-        ${g.rollType==='benefit'?'⬆ BENEFIT SCENARIO':'⬇ PROBLEM SCENARIO'}
-      </div>
-    </div>
-  `);
-  setTimeout(()=>{
-    if(g.turn==='human') startHumanTurn();
-    else startAITurn();
   },1000);
 }
 
-// ══ CHANCE CARD ══
-function showChanceCard(){
-  const card=CHANCE_CARDS[Math.floor(Math.random()*CHANCE_CARDS.length)];
-  g.chanceAction=card.action;
+function stopTimer(){
+  if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+}
+
+// ══ SCENARIO ══
+function panels(){return document.getElementById('panels');}
+function clearPanels(){panels().innerHTML='';}
+function addCard(html){
+  const d=document.createElement('div');
+  d.className='card';
+  d.innerHTML=html;
+  panels().appendChild(d);
+  setTimeout(()=>d.scrollIntoView({behavior:'smooth',block:'nearest'}),40);
+}
+
+function showScenario(){
   clearPanels();
+  if(pool.length===0) pool=shuffle([...SCENARIOS]);
+  const sc=pool.pop();
+  g.currentScenario=sc;
+  const opts=shuffle([...sc.options]);
+  g.currentOpts=opts;
+
   addCard(`
-    <div class="chance-card">
-      <span class="chance-icon">${card.icon}</span>
-      <div class="chance-title">${card.title}</div>
-      <p class="chance-body">${card.body}</p>
-      <div class="chance-effect ${card.cls}">${card.effect}</div>
+    <div class="ent-row">
+      <span class="ent-icon">${sc.icon}</span>
+      <div>
+        <div class="ent-name">${sc.entity}</div>
+        <div class="ent-flavor">${sc.flavor}</div>
+      </div>
     </div>
+    <span class="card-label">▸ THE SITUATION</span>
+    <p class="situation">${sc.situation}</p>
   `);
-  addCard(`<div class="btn-row"><button class="btn" onclick="resolveChance('${card.action}')">CONTINUE</button></div>`);
-}
 
-function resolveChance(action){
-  const gameAvg=allAvg();
-  switch(action){
-    case'bonus':
-      if(g.turn==='human'){g.hScore+=5;g.hScoreHist.push(5);}
-      else{g.aiScore+=5;g.aiScoreHist.push(5);}
-      g.history.push({round:g.round,who:g.turn==='human'?g.humanName:'AI',entity:'Moral Windfall',score:5});
-      updateHUD();advanceTurn();break;
-    case'immunity':
-      if(g.turn==='human'){g.hScore+=3;g.hScoreHist.push(3);}
-      else{g.aiScore+=3;g.aiScoreHist.push(3);}
-      g.history.push({round:g.round,who:g.turn==='human'?g.humanName:'AI',entity:'Immunity',score:3});
-      updateHUD();advanceTurn();break;
-    case'arrest':{
-      const myHist=g.turn==='human'?g.hScoreHist:g.aiScoreHist;
-      const myAvg=myHist.length?myHist.reduce((a,b)=>a+b,0)/myHist.length:0;
-      if(myAvg<gameAvg){
-        if(g.turn==='human')g.hScore-=10;else g.aiScore-=10;
-        g.history.push({round:g.round,who:g.turn==='human'?g.humanName:'AI',entity:'House Arrest',score:-10});
-        updateHUD();
-      }
-      advanceTurn();break;
-    }
-    case'class':{
-      const myHist=g.turn==='human'?g.hScoreHist:g.aiScoreHist;
-      const myAvg=myHist.length?myHist.reduce((a,b)=>a+b,0)/myHist.length:0;
-      if(myAvg<gameAvg){
-        if(g.turn==='human')g.hScore-=10;else g.aiScore-=10;
-        g.history.push({round:g.round,who:g.turn==='human'?g.humanName:'AI',entity:'Class Action',score:-10});
-        updateHUD();
-      }
-      advanceTurn();break;
-    }
-    case'sue':{
-      const oppHist=g.turn==='human'?g.aiScoreHist:g.hScoreHist;
-      if(oppHist.length){
-        const last=oppHist[oppHist.length-1];
-        const avg=oppHist.reduce((a,b)=>a+b,0)/oppHist.length;
-        if(last<avg){
-          if(g.turn==='human')g.aiScore-=10;else g.hScore-=10;
-          g.history.push({round:g.round,who:g.turn==='human'?g.humanName:'AI',entity:'Sue',score:10,note:'Opponent penalised'});
-          updateHUD();
-        }
-      }
-      advanceTurn();break;
-    }
-    case'double':
-      g.doubleStakes=true;
-      if(g.currentEntity)showEntityReveal(g.currentEntity);
-      else{const ent=ENTITIES[Math.floor(Math.random()*ENTITIES.length)];g.currentEntity=ent;showEntityReveal(ent);}
-      break;
-    case'reverse':
-      // Force AI turn but human writes
-      g.turn=g.turn==='human'?'ai':'human';
-      if(g.currentEntity)showEntityReveal(g.currentEntity);
-      else{const ent=ENTITIES[Math.floor(Math.random()*ENTITIES.length)];g.currentEntity=ent;showEntityReveal(ent);}
-      break;
-    case'free':
-      // Human picks entity — show first 8 as quick options
-      showFreeChoice();break;
-    default:advanceTurn();
-  }
-}
+  const optsHtml=opts.map((o,i)=>`
+    <button class="opt" id="opt${i}" onclick="pickOption(${i})">
+      <div class="opt-inner">
+        <span class="opt-text">${o.text}</span>
+        <div class="opt-reveal">
+          <span class="opt-badge">${o.label}</span>
+          <span class="opt-why">${o.why}</span>
+          <span class="opt-pts">${o.score>0?'+':''}${o.score}</span>
+        </div>
+      </div>
+    </button>
+  `).join('');
 
-function showFreeChoice(){
-  clearPanels();
-  const picks=ENTITIES.slice(0,8);
-  const btns=picks.map((e,i)=>`
-    <button class="btn ghost" style="margin-bottom:6px;text-align:left;padding:10px 14px;font-family:'Cormorant Garamond',serif;font-size:0.95rem;letter-spacing:0;"
-      onclick="chooseFreeEntity(${i})">
-      ${e.icon} <strong>${e.name}</strong> <span style="opacity:0.5;font-size:0.8rem;">— ${e.flavor}</span>
-    </button>`).join('');
-  addCard(`<div><p style="font-family:'Cormorant Garamond',serif;color:var(--parchment);margin-bottom:12px;font-style:italic;">Choose your battlefield:</p>${btns}</div>`);
-}
-
-function chooseFreeEntity(idx){
-  g.currentEntity=ENTITIES[idx];
-  showEntityReveal(g.currentEntity);
-}
-
-function allAvg(){
-  const all=[...g.hScoreHist,...g.aiScoreHist];
-  return all.length?all.reduce((a,b)=>a+b,0)/all.length:0;
-}
-
-// ══ HUMAN TURN ══
-async function startHumanTurn(){
-  const lv=LEVELS[g.level];
-  const ent=g.currentEntity;
-  // Show loading
-  addCard(`<div class="loading-text">⚖ Crafting your scenario…</div>`);
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:lv.tokScene,
-        messages:[{role:'user',content:
-`${lv.scenarioPrompt}
-The player landed on "${ent.name}" — ${ent.flavor}.
-Make this entity central to the scenario.
-Scenario type: ${g.rollType==='benefit'?'a tempting opportunity with a moral cost':'a serious moral problem with real consequences'}.
-Output the scenario only. No title, no label.`
-        }]})
-    });
-    const data=await res.json();
-    const scenario=data.content.map(i=>i.text||'').join('').trim();
-    g.scenario=scenario;
-    // Remove loading card
-    const last=panels().lastElementChild;if(last)last.remove();
-    showHumanScenario(scenario);
-  }catch(e){
-    const last=panels().lastElementChild;if(last)last.remove();
-    g.scenario=`You are faced with a difficult choice involving ${ent.name}. What do you do?`;
-    showHumanScenario(g.scenario);
-  }
-}
-
-function showHumanScenario(scenario){
   addCard(`
-    <span class="scene-label">▸ SCENARIO</span>
-    <p class="scene-text">${scenario}</p>
-  `);
-  addCard(`
-    <span class="scene-label">▸ YOUR RESPONSE — Voice recorder → paste</span>
-    <textarea id="human-ans" placeholder="State your position clearly…"></textarea>
-    <div class="btn-row" style="margin-top:10px;">
-      <button class="btn" onclick="submitHumanAnswer()">SUBMIT</button>
-    </div>
+    <span class="card-label">▸ WHAT DO YOU DO?</span>
+    <div class="options">${optsHtml}</div>
   `);
 }
 
-async function submitHumanAnswer(){
-  const raw=document.getElementById('human-ans').value.trim();
-  if(!raw){alert('Please enter your response.');return;}
-  g.humanAnswer=raw;
-  const lv=LEVELS[g.level];
-  // Remove input card
-  const last=panels().lastElementChild;if(last)last.remove();
-  addCard(`<div class="loading-text">⚖ AI is judging your answer…</div>`);
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:lv.tokJudge,
-        messages:[{role:'user',content:
-`ETHICS game. ${lv.judgePrompt}
-Scenario: "${g.scenario}"
-Response (interpret charitably — may be voice transcription): "${raw}"
-Score -10 to +10. They can argue after.
-JSON only: {"score":<int>,"verdict":"...","best_answer":"..."}`
-        }]})
-    });
-    const data=await res.json();
-    const result=JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
-    g.aiInitialScore=result.score;
-    const last2=panels().lastElementChild;if(last2)last2.remove();
-    showHumanJudgment(raw,result);
-  }catch(e){
-    const last2=panels().lastElementChild;if(last2)last2.remove();
-    g.aiInitialScore=0;
-    showHumanJudgment(raw,{score:0,verdict:'Unable to score at this time.',best_answer:''});
-  }
-}
+function pickOption(idx){
+  stopTimer();
+  document.querySelectorAll('.opt').forEach(o=>o.disabled=true);
+  document.getElementById(`opt${idx}`).classList.add('selected');
+  g.currentOpts.forEach((o,i)=>{
+    document.getElementById(`opt${i}`).classList.add('revealed',o.cls);
+  });
 
-function showHumanJudgment(raw,result){
-  const sc=result.score,cls=sc>0?'pos':sc<0?'neg':'neu';
+  const chosen=g.currentOpts[idx];
+  const p=g.players[g.current];
+  p.score+=chosen.score;
+  p.history.push({entity:g.currentScenario.entity,score:chosen.score,label:chosen.label});
+  g.history.push({who:p.name,entity:g.currentScenario.entity,score:chosen.score,label:chosen.label});
+  updateHUD();
+
+  const cls=chosen.score>0?'pos':chosen.score<0?'neg':'neu';
   addCard(`
-    <div class="response-bubble blue">
-      <span class="bubble-label">▸ YOUR RESPONSE</span>
-      <p class="bubble-text">${raw}</p>
-    </div>
-    <div class="response-bubble">
-      <span class="bubble-label">▸ AI VERDICT</span>
-      <p class="bubble-text">${result.verdict}</p>
-      ${result.best_answer?`<p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.82rem;color:rgba(245,237,220,0.38);margin-top:8px;">Ideal: ${result.best_answer}</p>`:''}
-    </div>
     <div class="score-pop ${cls}">
-      <span class="score-big">${sc>0?'+':''}${sc}</span>
-      <span class="score-sub">PROVISIONAL · YOU CAN ARGUE</span>
+      <span class="score-big">${chosen.score>0?'+':''}${chosen.score}</span>
+      <span class="score-sub">${chosen.label.toUpperCase()} · TOTAL: ${p.score>0?'+':''}${p.score}</span>
     </div>
     <div class="btn-row">
-      <button class="btn ghost sm" onclick="showArgue()">ARGUE</button>
-      <button class="btn sm" onclick="acceptScore()">ACCEPT</button>
+      <button class="btn" onclick="afterAnswer()">NEXT →</button>
     </div>
   `);
 }
 
-function showArgue(){
-  addCard(`
-    <span class="scene-label">▸ MAKE YOUR CASE — Voice → paste</span>
-    <textarea id="human-arg" placeholder="Present your argument…"></textarea>
-    <div class="btn-row" style="margin-top:10px;">
-      <button class="btn ghost sm" onclick="acceptScore()">GIVE UP</button>
-      <button class="btn sm" onclick="submitArgue()">ARGUE</button>
-    </div>
-  `);
-}
-
-async function submitArgue(){
-  const raw=document.getElementById('human-arg').value.trim();
-  if(!raw){alert('Write your argument first.');return;}
-  const lv=LEVELS[g.level];
-  const last=panels().lastElementChild;if(last)last.remove();
-  addCard(`<div class="loading-text">⚖ Reconsidering…</div>`);
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:lv.tokArgue,
-        messages:[{role:'user',content:
-`ETHICS game. ${lv.arguePrompt}
-Original score: ${g.aiInitialScore}. Scenario: "${g.scenario}". Response: "${g.humanAnswer}". Argument: "${raw}"
-Adjust -5 to +5.
-JSON only: {"adjustment":<int>,"response":"..."}`
-        }]})
-    });
-    const data=await res.json();
-    const result=JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
-    const final=g.aiInitialScore+result.adjustment;
-    const last2=panels().lastElementChild;if(last2)last2.remove();
-    finishHumanTurn(final,result.response,result.adjustment);
-  }catch(e){
-    const last2=panels().lastElementChild;if(last2)last2.remove();
-    acceptScore();
+function afterAnswer(){
+  const p=g.players[g.current];
+  if(p.timeLeft<=0||p.done){
+    p.done=true;
+    showTimeUp();
+  } else {
+    // Resume timer and show next scenario
+    startTimer();
+    showScenario();
   }
 }
 
-function acceptScore(){finishHumanTurn(g.aiInitialScore,'Score accepted.',0);}
-
-function finishHumanTurn(final,comment,adj){
-  let score=g.doubleStakes?final*2:final;
-  g.doubleStakes=false;
-  g.hScore+=score;g.hScoreHist.push(score);
-  g.history.push({round:g.round,who:g.humanName,entity:g.currentEntity.name,score});
+// ══ TIME UP ══
+function showTimeUp(){
+  stopTimer();
+  const p=g.players[g.current];
+  p.done=true;
   updateHUD();
-  const cls=score>0?'pos':score<0?'neg':'neu';
-  addCard(`
-    ${comment&&adj!==0?`<div class="response-bubble"><span class="bubble-label">▸ FINAL JUDGMENT</span><p class="bubble-text">${comment}</p></div>`:''}
-    <div class="score-pop ${cls}">
-      <span class="score-big">${score>0?'+':''}${score}</span>
-      <span class="score-sub">${adj?`ADJ: ${adj>0?'+':''}${adj} · `:''}YOUR TOTAL: ${g.hScore>0?'+':''}${g.hScore}</span>
-    </div>
-    <div class="btn-row"><button class="btn" onclick="advanceTurn()">NEXT TURN →</button></div>
-  `);
-}
-
-// ══ AI TURN ══
-function startAITurn(){
-  // Human writes the scenario for AI
-  const ent=g.currentEntity;
   clearPanels();
   addCard(`
-    <div class="entity-card" style="margin-bottom:4px;">
-      <span class="entity-icon">${ent.icon}</span>
-      <div class="entity-name">${ent.name}</div>
-      <div class="entity-flavor">${ent.flavor}</div>
-      <div class="type-badge ${g.rollType}">${g.rollType==='benefit'?'⬆ BENEFIT':'⬇ PROBLEM'}</div>
+    <div class="timeup-banner">
+      <span class="timeup-title">⏱ TIME UP</span>
+      <div class="timeup-sub">${p.name.toUpperCase()} · FINAL SCORE: ${p.score>0?'+':''}${p.score}</div>
     </div>
   `);
-  addCard(`
-    <span class="scene-label">▸ WRITE THE SCENARIO FOR AI — Voice → paste</span>
-    <p style="font-family:'DM Mono',monospace;font-size:0.6rem;color:rgba(245,237,220,0.35);margin-bottom:10px;line-height:1.6;">Make it genuinely challenging. AI will respond honestly.</p>
-    <textarea id="ai-scenario-input" placeholder="Describe the situation for the AI to face…"></textarea>
-    <div class="btn-row" style="margin-top:10px;">
-      <button class="btn" onclick="submitAIScenario()">PRESENT TO AI</button>
-    </div>
-  `);
-}
 
-async function submitAIScenario(){
-  const raw=document.getElementById('ai-scenario-input').value.trim();
-  if(!raw){alert('Please write a scenario first.');return;}
-  const lv=LEVELS[g.level];
-  const last=panels().lastElementChild;if(last)last.remove();
-  addCard(`<div class="loading-text">⚖ AI is formulating its response…</div>`);
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:lv.tokResp,
-        messages:[{role:'user',content:
-`${lv.responseGuide}
-ETHICS game. You are a player. You landed on "${g.currentEntity.name}" — ${g.currentEntity.flavor}.
-Scenario (may be rough voice transcription — interpret charitably): "${raw}"
-First: restate the scenario cleanly on one line starting "SCENARIO: "
-Then: ---
-Then: your honest, specific response.`
-        }]})
-    });
-    const data=await res.json();
-    const reply=data.content.map(i=>i.text||'').join('');
-    const parts=reply.split('---');
-    const scenClean=(parts[0]||'').replace(/SCENARIO:/i,'').trim();
-    const aiReply=(parts[1]||reply).trim();
-    g.scenario=scenClean||raw;g.aiResponse=aiReply;
-    const last2=panels().lastElementChild;if(last2)last2.remove();
-    showAIResponse(scenClean||raw,aiReply);
-  }catch(e){
-    const last2=panels().lastElementChild;if(last2)last2.remove();
-    g.scenario=raw;g.aiResponse='Unable to respond.';
-    showAIResponse(raw,'Unable to respond at this time.');
+  // Check if all done
+  const allDone=g.players.every(p=>p.done);
+  if(allDone){
+    addCard(`<div class="btn-row"><button class="btn" onclick="endGame()">SEE RESULTS →</button></div>`);
+  } else {
+    advancePlayer();
+    addCard(`<div class="btn-row"><button class="btn" onclick="showPassScreen()">PASS TO NEXT PLAYER →</button></div>`);
   }
 }
 
-function showAIResponse(scenario,response){
-  addCard(`
-    <div class="response-bubble">
-      <span class="bubble-label">▸ SCENARIO</span>
-      <p class="bubble-text">${scenario}</p>
-    </div>
-    <div class="response-bubble red">
-      <span class="bubble-label">▸ AI RESPONSE</span>
-      <p class="bubble-text">${response.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>')}</p>
-    </div>
-  `);
-  addCard(`
-    <span class="scene-label">▸ YOUR VERDICT — Voice → paste</span>
-    <textarea id="human-verdict" placeholder="How do you judge this response?…"></textarea>
-    <div class="btn-row" style="margin-top:10px;">
-      <button class="btn" onclick="submitVerdict()">DELIVER VERDICT</button>
-    </div>
-  `);
-}
-
-async function submitVerdict(){
-  const raw=document.getElementById('human-verdict').value.trim();
-  if(!raw){alert('Please enter your verdict.');return;}
-  const lv=LEVELS[g.level];
-  const last=panels().lastElementChild;if(last)last.remove();
-  addCard(`<div class="loading-text">⚖ AI scoring itself…</div>`);
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:lv.tokSelf,
-        messages:[{role:'user',content:
-`ETHICS game. Score yourself honestly. ${lv.selfPrompt}
-Scenario: "${g.scenario}" | Your response: "${g.aiResponse}" | Verdict (interpret charitably): "${raw}"
-Score -10 to +10. JSON only: {"score":<int>,"self_assessment":"...","what_i_missed":"..."}`
-        }]})
-    });
-    const data=await res.json();
-    const result=JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
-    const last2=panels().lastElementChild;if(last2)last2.remove();
-    finishAITurn(result);
-  }catch(e){
-    const last2=panels().lastElementChild;if(last2)last2.remove();
-    finishAITurn({score:0,self_assessment:'Unable to self-score.',what_i_missed:''});
-  }
-}
-
-function finishAITurn(result){
-  let score=g.doubleStakes?result.score*2:result.score;
-  g.doubleStakes=false;
-  g.aiScore+=score;g.aiScoreHist.push(score);
-  g.history.push({round:g.round,who:'AI',entity:g.currentEntity.name,score});
-  updateHUD();
-  const cls=score>0?'pos':score<0?'neg':'neu';
-  addCard(`
-    <div class="response-bubble red">
-      <span class="bubble-label">▸ AI SELF-ASSESSMENT</span>
-      <p class="bubble-text">${result.self_assessment}</p>
-      ${result.what_i_missed?`<p style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.82rem;color:rgba(245,237,220,0.38);margin-top:8px;">Missed: ${result.what_i_missed}</p>`:''}
-    </div>
-    <div class="score-pop ${cls}">
-      <span class="score-big">${score>0?'+':''}${score}</span>
-      <span class="score-sub">AI TOTAL: ${g.aiScore>0?'+':''}${g.aiScore}</span>
-    </div>
-    <div class="btn-row"><button class="btn" onclick="advanceTurn()">NEXT TURN →</button></div>
-  `);
-}
-
-// ══ ADVANCE TURN ══
-function advanceTurn(){
-  if(g.turnsUsed>=g.maxTurns){endGame('turn limit reached');return;}
-  if(g.turn==='human'){g.round++;setTurn('ai');}
-  else setTurn('human');
+function advancePlayer(){
+  // Find next non-done player
+  const total=g.players.length;
+  let next=(g.current+1)%total;
+  let tries=0;
+  while(g.players[next].done&&tries<total){next=(next+1)%total;tries++;}
+  g.current=next;
 }
 
 // ══ END GAME ══
@@ -1314,36 +609,43 @@ function getRating(sc){
   return['❌','Moral Failure'];
 }
 
-function endGame(reason){
-  const hR=getRating(g.hScore),aiR=getRating(g.aiScore);
-  const hWin=g.hScore>g.aiScore,tie=g.hScore===g.aiScore;
-  document.getElementById('win-reason').textContent=`Game ended — ${reason}`;
-  document.getElementById('win-title').textContent=tie?'A TIE':(hWin?`${g.humanName} WINS`:'AI WINS');
-  document.getElementById('final-grid').innerHTML=`
-    <div class="fp ${hWin&&!tie?'winner':''}">
-      <div class="fp-name" style="color:#5dade2">${g.humanName}</div>
-      <div class="fp-score">${g.hScore>0?'+':''}${g.hScore}</div>
-      <div class="fp-rating">${hR[0]} ${hR[1]}</div>
-    </div>
-    <div class="fp ${!hWin&&!tie?'winner':''}">
-      <div class="fp-name" style="color:#e74c3c">AI</div>
-      <div class="fp-score">${g.aiScore>0?'+':''}${g.aiScore}</div>
-      <div class="fp-rating">${aiR[0]} ${aiR[1]}</div>
+function endGame(){
+  stopTimer();
+  const sorted=[...g.players].sort((a,b)=>b.score-a.score);
+  const winner=sorted[0];
+  const tie=sorted.length>1&&sorted[0].score===sorted[1].score;
+
+  document.getElementById('win-title').textContent=tie?'A TIE':winner.name.toUpperCase()+' WINS';
+  document.getElementById('win-sub').textContent=tie?'Equally matched in moral judgement':'The moral high ground belongs to one';
+
+  const rankCls=['first','second','third'];
+  document.getElementById('podium').innerHTML=sorted.map((p,i)=>{
+    const r=getRating(p.score);
+    return `<div class="pod ${rankCls[i]||''}">
+      <div class="pod-rank">${i+1}</div>
+      <div class="pod-info">
+        <div class="pod-name">${p.name}</div>
+        <div class="pod-rating">${r[0]} ${r[1]}</div>
+      </div>
+      <div class="pod-score">${p.score>0?'+':''}${p.score}</div>
     </div>`;
-  document.getElementById('history-log').innerHTML=g.history.map(h=>`
-    <div class="log-row">
-      <span style="color:${h.who===g.humanName?'#5dade2':'#e74c3c'}">${h.who}</span>
-      <span style="color:rgba(245,237,220,0.4);flex:1;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${h.entity}</span>
+  }).join('');
+
+  document.getElementById('hist-log').innerHTML=g.history.map(h=>{
+    const pi=g.players.findIndex(p=>p.name===h.who);
+    const colours=['#5dade2','#e07060','#7dbb8a'];
+    return `<div class="hist-row">
+      <span style="color:${colours[pi]||'#aaa'};min-width:65px;">${h.who.slice(0,9)}</span>
+      <span style="color:rgba(245,237,220,0.35);flex:1;padding:0 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${h.entity}</span>
+      <span style="color:rgba(245,237,220,0.28);margin-right:6px;font-size:0.5rem;">${h.label}</span>
       <span style="color:${h.score>=0?'#4caf7d':'var(--ember)'}">${h.score>0?'+':''}${h.score}</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+
   showScreen('s-win');
 }
 
-function resetGame(){
-  ENTITIES=[];
-  document.getElementById('logo-sub').textContent='Good intentions meet real decisions';
-  showScreen('s-setup');
-}
+function resetGame(){stopTimer();showScreen('s-setup');}
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
